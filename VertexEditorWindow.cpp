@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "VertexEditorWindow.h"
 
 /**
@@ -10,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.02
+ * @version 2018.01.03
  */
 
 /**
@@ -108,11 +106,13 @@ void VertexEditorWindow::handleAddDataSet ()
 
     if (confirmed)
     {
-        QList <QString>::iterator it = dataSetList->begin ();
-        for (; it != dataSetList->end () /* && *it < name*/; it++);
+        if (!dataSetList->contains (name))
+        {
+            dataSetList->append (name);
+            std::sort (dataSetList->begin (), dataSetList->end ());
 
-        dataSetList->insert (it, name);
-        dataSetListWidget->insertItem (it - dataSetList->begin (), name);
+            dataSetListWidget->insertItem (dataSetList->indexOf (name), name);
+        }
     }
 }
 
@@ -123,6 +123,7 @@ void VertexEditorWindow::handleAddDataSet ()
 void VertexEditorWindow::handleOpenImage ()
 {
     QString filename = QFileDialog::getOpenFileName (this);
+    vertexImage->setImageFile (filename);
 }
 
 /**

@@ -1,6 +1,8 @@
 #ifndef VERTEXEDITORWINDOW_H
 #define VERTEXEDITORWINDOW_H
 
+#include <algorithm>
+
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QInputDialog>
@@ -11,7 +13,6 @@
 #include <QMenuBar>
 #include <QPushButton>
 #include <QString>
-#include <QStringList>
 #include <QTableWidget>
 #include <QVBoxLayout>
 
@@ -25,7 +26,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.02
+ * @version 2018.01.03
  */
 class VertexEditorWindow : public QMainWindow
 {

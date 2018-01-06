@@ -3,6 +3,7 @@
 
 #include <algorithm>
 
+#include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QInputDialog>
@@ -11,6 +12,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QString>
 #include <QTableWidget>
@@ -26,7 +28,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.03
+ * @version 2018.01.04
  */
 class VertexEditorWindow : public QMainWindow
 {
@@ -56,6 +58,7 @@ class VertexEditorWindow : public QMainWindow
         QMenu           *fileMenu;
         QPushButton     *addDataSetButton, *clearDataSetButton, *clearAllDataSetsButton,
                             *deleteDataSet, *deleteAllDataSets;
+        QString         lastOpenedDirPath = QDir::homePath ();
         QTableWidget    *selectedDataSetTable;
         QVBoxLayout     *dataSetVBox;
         QWidget         *centralWidget;
@@ -68,6 +71,8 @@ class VertexEditorWindow : public QMainWindow
                                                         "\nas any will be removed upon creation. Multiple data sets"
                                                         "\ncan be created by separating the names with a semicolon"
                                                         " (';').";
+        const QString FILE_INPUT_HEADER             = "Open Image",
+                        FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
 
     private slots:
         /**

@@ -8,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.03
+ * @version 2018.01.04
  */
 
 /**
@@ -101,17 +101,31 @@ void VertexEditorWindow::handleAddDataSet ()
         dataSetList = new QList <QString> ();
 
     bool confirmed;
-    QString name = QInputDialog::getText (this, DATA_SET_INPUT_DIALOG_HEADER, DATA_SET_INPUT_DIALOG_DESC,
-        QLineEdit::Normal, "", &confirmed);
+    QStringList names = QInputDialog::getText (this, DATA_SET_INPUT_DIALOG_HEADER, DATA_SET_INPUT_DIALOG_DESC,
+        QLineEdit::Normal, "", &confirmed)
+        .simplified ()
+        .replace (" ", "")
+        .split (";", QString::SkipEmptyParts);
 
     if (confirmed)
     {
-        if (!dataSetList->contains (name))
+        for (QString s : names)
         {
-            dataSetList->append (name);
-            std::sort (dataSetList->begin (), dataSetList->end ());
+            if (!dataSetList->contains (s))
+            {
+                dataSetList->append (s);
+                std::sort (dataSetList->begin (), dataSetList->end ());
 
-            dataSetListWidget->insertItem (dataSetList->indexOf (name), name);
+                dataSetListWidget->insertItem (dataSetList->indexOf (s), s);
+            }
+
+            else
+            {
+                // Prompt user if they would like to rename one of the conflicting data sets
+                QString errorText = QString ("A data set with the name '%1' already exists."
+                    "\nYou can either clear that data set, or delete it and add it again.").arg (s);
+                QMessageBox::critical (this, "Error", errorText);
+            }
         }
     }
 }
@@ -122,8 +136,14 @@ void VertexEditorWindow::handleAddDataSet ()
  */
 void VertexEditorWindow::handleOpenImage ()
 {
-    QString filename = QFileDialog::getOpenFileName (this);
-    vertexImage->setImageFile (filename);
+    QString filepath = QFileDialog::getOpenFileName (this, FILE_INPUT_HEADER, lastOpenedDirPath,
+        FILE_INPUT_FILE_TYPES);
+
+    if (!filepath.isEmpty ())
+    {
+        lastOpenedDirPath = filepath.left (filepath.lastIndexOf (QDir::separator ()));
+        vertexImage->setImageFile (filepath);
+    }
 }
 
 /**
@@ -132,5 +152,6 @@ void VertexEditorWindow::handleOpenImage ()
  */
 void VertexEditorWindow::handleSaveDataSets ()
 {
-    QString filename = QFileDialog::getSaveFileName (this);
+    if (dataSetList && dataSetList->length () > 0)
+        QString filename = QFileDialog::getSaveFileName (this, "Save Data Sets", lastOpenedDirPath);
 }

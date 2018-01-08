@@ -73,7 +73,7 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
 
     centralWidget->setLayout (gridLayout);
     resize (minimumSize ());
-    //setWindowTitle (Utils::getTitle ());
+    setWindowTitle (WINDOW_TITLE);
 }
 
 /**

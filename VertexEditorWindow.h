@@ -74,6 +74,7 @@ class VertexEditorWindow : public QMainWindow
                                                         " (';').";
         const QString FILE_INPUT_HEADER             = "Open Image",
                         FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
+        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.01.07";
 
     private slots:
         /**

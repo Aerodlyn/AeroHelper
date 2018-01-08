@@ -8,9 +8,8 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-NAME = 'AeroHelper | Ver: $$system("date +%Y.%m.%d")'
-
-TARGET = "AeroHelper - Ver. $$system('date +%Y.%m.%d')"
+#TARGET = "AeroHelper - Ver. $$system('date +%Y.%m.%d')"
+TARGET = AeroHelper
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use

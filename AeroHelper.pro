@@ -4,11 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = AeroHelper
+NAME = 'AeroHelper | Ver: $$system("date +%Y.%m.%d")'
+
+TARGET = "AeroHelper - Ver. $$system('date +%Y.%m.%d')"
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -26,11 +28,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         VertexEditorWindow.cpp \
     Main.cpp \
-    VertexEditorImage.cpp
+    VertexEditorImage.cpp \
+    Utils.cpp
 
 HEADERS += \
         VertexEditorWindow.h \
-    VertexEditorImage.h
+    VertexEditorImage.h \
+    Utils.h
 
 DISTFILES += \
     Test.png

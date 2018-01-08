@@ -18,6 +18,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
+#include "Utils.h"
 #include "VertexEditorImage.h"
 
 /**

@@ -6,7 +6,7 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.01.13
+ * @version 2018.01.14
  */
 
 /**
@@ -45,7 +45,8 @@ void VertexEditorImage::setImageFile (QString &filepath)
 /* Protected Methods */
 void VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
-    emit mouseClicked (event->x (), event->y ());
+    if (!image->isNull ())
+        emit mouseClicked (event->x (), event->y ());
 }
 
 void VertexEditorImage::paintEvent (QPaintEvent *event)

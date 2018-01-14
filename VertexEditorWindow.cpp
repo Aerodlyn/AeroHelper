@@ -1,5 +1,7 @@
 #include "VertexEditorWindow.h"
 
+#include <iostream>
+
 /**
  * Represents the original version of AeroHelper.
  *
@@ -8,7 +10,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.04
+ * @version 2018.01.13
  */
 
 /**
@@ -62,14 +64,16 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
 
     dataSetListWidget = new QListWidget ();
     gridLayout->addWidget (dataSetListWidget, 1, 1);
+    connect (dataSetListWidget, &QListWidget::currentRowChanged, this, &VertexEditorWindow::handleDataSelection);
 
     selectedDataSetTable = new QTableWidget (10, 2);
     selectedDataSetTable->setAlternatingRowColors (true);
     selectedDataSetTable->setHorizontalHeaderLabels (headerList);
     gridLayout->addWidget (selectedDataSetTable, 2, 1);
 
-    vertexImage = new VertexEditorImage ();
+    vertexImage = new VertexEditorImage (this, currentDataSetPoints);
     gridLayout->addWidget (vertexImage, 0, 0, gridLayout->rowCount (), 1);
+    connect (vertexImage, &VertexEditorImage::mouseClicked, this, &VertexEditorWindow::addPointToSelectedDataSet);
 
     centralWidget->setLayout (gridLayout);
     resize (minimumSize ());
@@ -79,17 +83,31 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
 /**
  * Destroys the VertexEditorWindow.
  *  NOTE: Most of the memory management is done by Qt.
+ *  NOTE: This is here in case I need it in the future, but it does nothing at the moment.
  */
 VertexEditorWindow::~VertexEditorWindow ()
 {
-    if (dataSetList)
-    {
-        delete dataSetList;
-        dataSetList = nullptr;
-    }
+
 }
 
 /* Private methods */
+/**
+ * Adds the given coordinates to the currently selected data set.
+ *  NOTE: Does nothing if no data set is selected.
+ *
+ * @param x The x coordinate
+ * @param y The y coordinate
+ */
+void VertexEditorWindow::addPointToSelectedDataSet (const float x, const float y)
+{
+    if (dataSetListWidget->selectedItems ().size () > 0)
+    {
+        currentDataSetPoints.append (x);
+        currentDataSetPoints.append (y);
+
+        *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+    }
+}
 
 /**
  * Handles attempting to add a new data set. Prompts the user to enter the name of the new set,
@@ -98,9 +116,6 @@ VertexEditorWindow::~VertexEditorWindow ()
  */
 void VertexEditorWindow::handleAddDataSet ()
 {
-    if (!dataSetList)
-        dataSetList = new QList <QString> ();
-
     bool confirmed;
     QStringList names = QInputDialog::getText (this, DATA_SET_INPUT_DIALOG_HEADER, DATA_SET_INPUT_DIALOG_DESC,
         QLineEdit::Normal, "", &confirmed)
@@ -112,12 +127,15 @@ void VertexEditorWindow::handleAddDataSet ()
     {
         for (QString s : names)
         {
-            if (!dataSetList->contains (s))
+            if (!dataSetList.contains (s))
             {
-                dataSetList->append (s);
-                std::sort (dataSetList->begin (), dataSetList->end ());
+                dataSetList.append (s);
+                std::sort (dataSetList.begin (), dataSetList.end ());
 
-                dataSetListWidget->insertItem (dataSetList->indexOf (s), s);
+                int index = dataSetList.indexOf (s);
+
+                dataSetListWidget->insertItem (index, s);
+                dataSets.insert (index, QVector <float> ());
             }
 
             else
@@ -129,6 +147,18 @@ void VertexEditorWindow::handleAddDataSet ()
             }
         }
     }
+}
+
+/**
+ * Handles selected a row (data set) from the list widget that contains the names of all of
+ *  the data sets.
+ *
+ * @param currentRow The row (index) of the data set that was selected
+ */
+void VertexEditorWindow::handleDataSelection (int currentRow)
+{
+    selectedDataSetIndex = currentRow;
+    currentDataSetPoints = *(dataSets.data () + currentRow);
 }
 
 /**
@@ -153,6 +183,6 @@ void VertexEditorWindow::handleOpenImage ()
  */
 void VertexEditorWindow::handleSaveDataSets ()
 {
-    if (dataSetList && dataSetList->length () > 0)
+    if (dataSetList.length () > 0)
         QString filename = QFileDialog::getSaveFileName (this, "Save Data Sets", lastOpenedDirPath);
 }

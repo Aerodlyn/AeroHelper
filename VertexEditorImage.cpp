@@ -6,16 +6,19 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.01.03
+ * @version 2018.01.13
  */
 
 /**
  * Creates a new VertexEditorImage instance with the optional QWidget as the parent.
  *
- * @param parent The optional parent of this instance (though VertexEditorImage is designed
- *                  to be used with a VertexEditorWindow instance as a parent).
+ * @param parent    The optional parent of this instance (though VertexEditorImage is
+ *                      designed to be used with a VertexEditorWindow instance as a parent).
+ * @param pointList This represents the currently selected list of data points that this
+ *                      VertexEditorImage instance should draw
  */
-VertexEditorImage::VertexEditorImage (QWidget *parent) : QWidget (parent)
+VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <float> &pointList)
+    : QWidget (parent), POINTS_LIST (pointList), PARENT (parent)
 {
     image = new QImage ();
 
@@ -40,6 +43,11 @@ void VertexEditorImage::setImageFile (QString &filepath)
 }
 
 /* Protected Methods */
+void VertexEditorImage::mousePressEvent (QMouseEvent *event)
+{
+    emit mouseClicked (event->x (), event->y ());
+}
+
 void VertexEditorImage::paintEvent (QPaintEvent *event)
 {
     Q_UNUSED (event);

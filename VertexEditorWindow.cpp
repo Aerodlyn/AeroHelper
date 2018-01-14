@@ -1,7 +1,5 @@
 #include "VertexEditorWindow.h"
 
-#include <iostream>
-
 /**
  * Represents the original version of AeroHelper.
  *
@@ -10,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.13
+ * @version 2018.01.14
  */
 
 /**
@@ -66,7 +64,7 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
     gridLayout->addWidget (dataSetListWidget, 1, 1);
     connect (dataSetListWidget, &QListWidget::currentRowChanged, this, &VertexEditorWindow::handleDataSelection);
 
-    selectedDataSetTable = new QTableWidget (10, 2);
+    selectedDataSetTable = new QTableWidget (0, 2);
     selectedDataSetTable->setAlternatingRowColors (true);
     selectedDataSetTable->setHorizontalHeaderLabels (headerList);
     gridLayout->addWidget (selectedDataSetTable, 2, 1);
@@ -85,12 +83,28 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
  *  NOTE: Most of the memory management is done by Qt.
  *  NOTE: This is here in case I need it in the future, but it does nothing at the moment.
  */
-VertexEditorWindow::~VertexEditorWindow ()
-{
-
-}
+VertexEditorWindow::~VertexEditorWindow () {}
 
 /* Private methods */
+/**
+ * Adds the given coordinates to the data table that represents the data of the currently
+ *  selected data set. The data will be added at the given row index.
+ *  TODO: Add insert functionality
+ *
+ * @param x     The x coordinate to add
+ * @param y     The y coordinate to add
+ * @param index The row index to add the coordinates to
+ */
+void VertexEditorWindow::addPointToDataTable (const float x, const float y, const int index)
+{
+    if (selectedDataSetTable->rowCount () <= index)
+        selectedDataSetTable->setRowCount (index + 1);
+
+    selectedDataSetTable->setCellWidget (index, 0, new QLabel (QString::number (x)));
+    selectedDataSetTable->setCellWidget (index, 1, new QLabel (QString::number (y)));
+}
+
+/* Private slots */
 /**
  * Adds the given coordinates to the currently selected data set.
  *  NOTE: Does nothing if no data set is selected.
@@ -104,6 +118,8 @@ void VertexEditorWindow::addPointToSelectedDataSet (const float x, const float y
     {
         currentDataSetPoints.append (x);
         currentDataSetPoints.append (y);
+
+        addPointToDataTable (x, y, currentDataSetPoints.size () / 2 - 1);
 
         *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
     }
@@ -159,6 +175,11 @@ void VertexEditorWindow::handleDataSelection (int currentRow)
 {
     selectedDataSetIndex = currentRow;
     currentDataSetPoints = *(dataSets.data () + currentRow);
+
+    selectedDataSetTable->clear ();
+
+    for (int i = 0; i < currentDataSetPoints.size (); i += 2)
+        addPointToDataTable (currentDataSetPoints.at (i), currentDataSetPoints.at (i + 1), i / 2);
 }
 
 /**

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QInputDialog>
+#include <QLabel>
 #include <QList>
 #include <QListWidget>
 #include <QMainWindow>
@@ -30,7 +31,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.13
+ * @version 2018.01.14
  */
 class VertexEditorWindow : public QMainWindow
 {
@@ -80,7 +81,18 @@ class VertexEditorWindow : public QMainWindow
                                                         " (';').";
         const QString FILE_INPUT_HEADER             = "Open Image",
                         FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
-        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.01.13";
+        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.01.14";
+
+        /**
+         * Adds the given coordinates to the data table that represents the data of the currently
+         *  selected data set. The data will be added at the given row index.
+         *  TODO: Add insert functionality
+         *
+         * @param x     The x coordinate to add
+         * @param y     The y coordinate to add
+         * @param index The row index to add the coordinates to
+         */
+        void addPointToDataTable (const float x, const float y, const int index);
 
     private slots:
         /**

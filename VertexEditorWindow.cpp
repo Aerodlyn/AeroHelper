@@ -180,6 +180,8 @@ void VertexEditorWindow::handleDataSelection (int currentRow)
 
     for (int i = 0; i < currentDataSetPoints.size (); i += 2)
         addPointToDataTable (currentDataSetPoints.at (i), currentDataSetPoints.at (i + 1), i / 2);
+
+    vertexImage->update ();
 }
 
 /**

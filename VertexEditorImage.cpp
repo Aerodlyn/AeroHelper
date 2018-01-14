@@ -46,7 +46,10 @@ void VertexEditorImage::setImageFile (QString &filepath)
 void VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     if (!image->isNull ())
+    {
         emit mouseClicked (event->x (), event->y ());
+        update ();
+    }
 }
 
 void VertexEditorImage::paintEvent (QPaintEvent *event)
@@ -59,4 +62,10 @@ void VertexEditorImage::paintEvent (QPaintEvent *event)
     painter.setBrush (QBrush (painter.pen ().color ()));
     painter.drawRect (0, 0, width () - 1, height () - 1);
     painter.drawImage ((width () - image->width ()) / 2, (height () - image->height ()) / 2, *image);
+
+    painter.setPen (QColor ("#000000"));
+    painter.setBrush (QBrush ("#FFFFFF"));
+
+    for (int i = 0; i < POINTS_LIST.size (); i += 2)
+        painter.drawEllipse (POINTS_LIST.at (i), POINTS_LIST.at (i + 1), 5, 5);
 }

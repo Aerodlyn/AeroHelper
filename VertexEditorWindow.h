@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QInputDialog>
+#include <QKeySequence>
 #include <QLabel>
 #include <QList>
 #include <QListWidget>
@@ -31,7 +32,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.14
+ * @version 2018.01.18
  */
 class VertexEditorWindow : public QMainWindow
 {
@@ -57,7 +58,7 @@ class VertexEditorWindow : public QMainWindow
 
         const unsigned int MARGIN = 5, SPACING = 5;
 
-        QAction                     *loadImageAction, *saveDataAction;
+        QAction                     *loadImageAction, *quitAction, *saveDataAction;
         QGridLayout                 *gridLayout;
         QList <QString>             dataSetList;
         QListWidget                 *dataSetListWidget;
@@ -124,6 +125,12 @@ class VertexEditorWindow : public QMainWindow
          *  opened image if one was previously opened.
          */
         void handleOpenImage ();
+
+        /**
+         * Handles gracefully exiting the program. If the user has unsaved data, a prompt will
+         *  inform the user of that and ask if they want to save the data before exiting.
+         */
+        void handleQuit ();
 
         /**
          * Handles saving the current data sets to file, whose filetype is of the users choosing (possibly

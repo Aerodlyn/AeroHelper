@@ -8,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.14
+ * @version 2018.01.18
  */
 
 /**
@@ -27,13 +27,32 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
 
     fileMenu = menuBar ()->addMenu ("&File");
 
-    loadImageAction = new QAction ("Load Image");
+    QList <QKeySequence> loadShortcuts = QList <QKeySequence> ();
+    loadShortcuts.append (QKeySequence ("Ctrl+L"));
+    loadShortcuts.append (QKeySequence ("Cmd+L"));
+
+    loadImageAction = new QAction ("&Load Image");
+    loadImageAction->setShortcuts (loadShortcuts);
     fileMenu->addAction (loadImageAction);
     connect (loadImageAction, &QAction::triggered, this, &VertexEditorWindow::handleOpenImage);
 
+    QList <QKeySequence> saveShortcuts = QList <QKeySequence> ();
+    saveShortcuts.append (QKeySequence ("Ctrl+S"));
+    saveShortcuts.append (QKeySequence ("Cmd+S"));
+
     saveDataAction = new QAction ("Save Data Sets");
+    saveDataAction->setShortcuts (saveShortcuts);
     fileMenu->addAction (saveDataAction);
     connect (saveDataAction, &QAction::triggered, this, &VertexEditorWindow::handleSaveDataSets);
+
+    QList <QKeySequence> quitShortcuts = QList <QKeySequence> ();
+    quitShortcuts.append (QKeySequence ("Ctrl+Q"));
+    quitShortcuts.append (QKeySequence ("Cmd+Q"));
+
+    quitAction = new QAction ("&Quit");
+    quitAction->setShortcuts (quitShortcuts);
+    fileMenu->addAction (quitAction);
+    connect (quitAction, &QAction::triggered, this, &VertexEditorWindow::handleQuit);
 
     gridLayout = new QGridLayout ();
     gridLayout->setMargin (MARGIN);
@@ -199,6 +218,12 @@ void VertexEditorWindow::handleOpenImage ()
         vertexImage->setImageFile (filepath);
     }
 }
+
+/**
+ * Handles gracefully exiting the program. If the user has unsaved data, a prompt will
+ *  inform the user of that and ask if they want to save the data before exiting.
+ */
+void VertexEditorWindow::handleQuit () { exit (0); }
 
 /**
  * Handles saving the current data sets to file, whose filetype is of the users choosing (possibly

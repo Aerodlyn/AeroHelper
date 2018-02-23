@@ -22,9 +22,11 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
     headerList.append (DATA_COLUMN_01_HEADER);
     headerList.append (DATA_COLUMN_02_HEADER);
 
+    // Or perhaps this
     centralWidget = new QWidget ();
     setCentralWidget (centralWidget);
 
+    // This might be the issue on Linux
     fileMenu = menuBar ()->addMenu ("&File");
 
     QList <QKeySequence> loadShortcuts = QList <QKeySequence> ();

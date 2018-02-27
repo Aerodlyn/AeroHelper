@@ -82,7 +82,7 @@ class VertexEditorWindow : public QMainWindow
                                                         " (';').";
         const QString FILE_INPUT_HEADER             = "Open Image",
                         FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
-        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.01.14";
+        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.02.27";
 
         /**
          * Adds the given coordinates to the data table that represents the data of the currently
@@ -113,7 +113,17 @@ class VertexEditorWindow : public QMainWindow
         void handleAddDataSet ();
 
         /**
-         * Handles selected a row (data set) from the list widget that contains the names of all of
+         * Handles clearing the currently selected data set. Does nothing if no data set is selected.
+         */
+        void handleClearDataSet ();
+
+        /**
+         * Handles clearing all currently existing data sets. Does nothing if no data sets exist.
+         */
+        void handleClearAllDataSets ();
+
+        /**
+         * Handles selecting a row (data set) from the list widget that contains the names of all of
          *  the data sets.
          *
          * @param currentRow The row (index) of the data set that was selected

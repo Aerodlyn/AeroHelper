@@ -1,9 +1,11 @@
 #ifndef VERTEXEDITORIMAGE_H
 #define VERTEXEDITORIMAGE_H
 
+#include <QCursor>
 #include <QImage>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPoint>
 #include <QVector>
 #include <QWidget>
 

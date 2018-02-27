@@ -47,6 +47,7 @@ void VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     if (!image->isNull ())
     {
+        // Look into handling floating points
         emit mouseClicked (event->x (), event->y ());
         update ();
     }

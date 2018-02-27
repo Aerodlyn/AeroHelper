@@ -16,7 +16,7 @@
  *
  * @param parent The parent of the VertexEditorWindow
  */
-VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
+VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent), selectedDataSetIndex (-1)
 {
     QStringList headerList;
     headerList.append (DATA_COLUMN_01_HEADER);
@@ -69,9 +69,11 @@ VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent)
 
     clearDataSetButton = new QPushButton ("Clear Selected Data Set");
     dataSetVBox->addWidget (clearDataSetButton);
+    connect (clearDataSetButton, &QPushButton::released, this, &VertexEditorWindow::handleClearDataSet);
 
     clearAllDataSetsButton = new QPushButton ("Clear All Data Sets");
     dataSetVBox->addWidget (clearAllDataSetsButton);
+    connect (clearAllDataSetsButton, &QPushButton::released, this, &VertexEditorWindow::handleClearAllDataSets);
 
     deleteDataSet = new QPushButton ("Delete Selected Data Set");
     dataSetVBox->addWidget (deleteDataSet);
@@ -137,8 +139,8 @@ void VertexEditorWindow::addPointToSelectedDataSet (const float x, const float y
 {
     if (dataSetListWidget->selectedItems ().size () > 0)
     {
-        currentDataSetPoints.append (x);
-        currentDataSetPoints.append (y);
+        currentDataSetPoints.append (x - 2.5f);
+        currentDataSetPoints.append (y - 2.5f);
 
         addPointToDataTable (x, y, currentDataSetPoints.size () / 2 - 1);
 
@@ -187,7 +189,40 @@ void VertexEditorWindow::handleAddDataSet ()
 }
 
 /**
- * Handles selected a row (data set) from the list widget that contains the names of all of
+ * Handles clearing the currently selected data set. Does nothing if no data set is selected.
+ */
+void VertexEditorWindow::handleClearDataSet ()
+{
+    if (selectedDataSetIndex != -1)
+    {
+        currentDataSetPoints.clear ();
+        selectedDataSetTable->clear ();
+
+        *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+
+        vertexImage->update ();
+    }
+}
+
+/**
+ * Handles clearing all currently existing data sets. Does nothing if no data sets exist.
+ */
+void VertexEditorWindow::handleClearAllDataSets ()
+{
+    for (int i = 0; i < dataSets.size (); i++)
+        (dataSets.data () + i)->clear ();
+
+    if (selectedDataSetIndex != -1)
+    {
+        currentDataSetPoints.clear ();
+
+        selectedDataSetTable->clear ();
+        vertexImage->update ();
+    }
+}
+
+/**
+ * Handles selecting a row (data set) from the list widget that contains the names of all of
  *  the data sets.
  *
  * @param currentRow The row (index) of the data set that was selected

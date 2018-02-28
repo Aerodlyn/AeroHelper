@@ -32,7 +32,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.18
+ * @version 2018.02.28
  */
 class VertexEditorWindow : public QMainWindow
 {
@@ -82,7 +82,7 @@ class VertexEditorWindow : public QMainWindow
                                                         " (';').";
         const QString FILE_INPUT_HEADER             = "Open Image",
                         FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
-        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.02.27";
+        const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.02.28";
 
         /**
          * Adds the given coordinates to the data table that represents the data of the currently

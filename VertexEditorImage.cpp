@@ -6,7 +6,7 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.01.14
+ * @version 2018.02.28
  */
 
 /**
@@ -57,6 +57,7 @@ void VertexEditorImage::paintEvent (QPaintEvent *event)
 {
     Q_UNUSED (event);
 
+    int size = POINTS_LIST.size ();
     QPainter painter (this);
 
     painter.setPen (BACKGROUND_COLOR);
@@ -67,6 +68,16 @@ void VertexEditorImage::paintEvent (QPaintEvent *event)
     painter.setPen (QColor ("#000000"));
     painter.setBrush (QBrush ("#FFFFFF"));
 
-    for (int i = 0; i < POINTS_LIST.size (); i += 2)
-        painter.drawEllipse (POINTS_LIST.at (i), POINTS_LIST.at (i + 1), 5, 5);
+    if (size >= 6)
+        painter.drawLine (POINTS_LIST.at (0), POINTS_LIST.at (1), POINTS_LIST.at (size - 2), POINTS_LIST.at (size - 1));
+
+    for (int i = 0; i < size; i += 2)
+    {
+        float x = POINTS_LIST.at (i), y = POINTS_LIST.at (i + 1);
+
+        if (size >= 4 && i < size - 2)
+            painter.drawLine (x, y, POINTS_LIST.at (i + 2), POINTS_LIST.at (i + 3));
+
+        painter.drawEllipse (x - POINT_RADIUS / 2.0f, y - POINT_RADIUS / 2.0f, POINT_RADIUS, POINT_RADIUS);
+    }
 }

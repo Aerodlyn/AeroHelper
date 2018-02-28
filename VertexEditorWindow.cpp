@@ -8,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.01.18
+ * @version 2018.02.28
  */
 
 /**
@@ -139,8 +139,8 @@ void VertexEditorWindow::addPointToSelectedDataSet (const float x, const float y
 {
     if (dataSetListWidget->selectedItems ().size () > 0)
     {
-        currentDataSetPoints.append (x - 2.5f);
-        currentDataSetPoints.append (y - 2.5f);
+        currentDataSetPoints.append (x);
+        currentDataSetPoints.append (y);
 
         addPointToDataTable (x, y, currentDataSetPoints.size () / 2 - 1);
 

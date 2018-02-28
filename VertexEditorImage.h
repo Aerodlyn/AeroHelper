@@ -15,7 +15,7 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.01.13
+ * @version 2018.02.28
  */
 class VertexEditorImage : public QWidget
 {
@@ -50,6 +50,8 @@ class VertexEditorImage : public QWidget
         void paintEvent (QPaintEvent *event) override;
 
     private:
+        const float POINT_RADIUS = 5.0f;
+
         QImage *image;
 
         const QColor            BACKGROUND_COLOR = QColor ("#FF19B9");

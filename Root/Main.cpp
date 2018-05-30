@@ -1,12 +1,12 @@
 #include <QApplication>
 
-#include "VertexEditorWindow.h"
+#include "VertexEditor/VertexEditorWindow.h"
 
 int main (int argc, char *argv [])
 {
     QApplication a (argc, argv);
 
-    VertexEditorWindow vertexWindow;
+    Aerodlyn::VertexEditorWindow vertexWindow;
     vertexWindow.show ();
 
     return a.exec ();

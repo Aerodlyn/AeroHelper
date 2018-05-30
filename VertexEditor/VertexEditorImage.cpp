@@ -6,7 +6,7 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.02.28
+ * @version 2018.05.30
  */
 
 /**
@@ -17,7 +17,7 @@
  * @param pointList This represents the currently selected list of data points that this
  *                      VertexEditorImage instance should draw
  */
-VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <float> &pointList)
+Aerodlyn::VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <float> &pointList)
     : QWidget (parent), POINTS_LIST (pointList), PARENT (parent)
 {
     image = new QImage ();
@@ -29,21 +29,21 @@ VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <float> &po
  * Destroys the VertexEditorImage.
  *  NOTE: Most of the memory management is done by Qt.
  */
-VertexEditorImage::~VertexEditorImage () { delete image; }
+Aerodlyn::VertexEditorImage::~VertexEditorImage () { delete image; }
 
 /**
  * Sets the image that is drawn to the one contained within the file at the given filepath.
  *
  * @param filepath The (full) filepath of the image file to set the image to draw
  */
-void VertexEditorImage::setImageFile (QString &filepath)
+void Aerodlyn::VertexEditorImage::setImageFile (QString &filepath)
 {
     image->load (filepath);
     update ();
 }
 
 /* Protected Methods */
-void VertexEditorImage::mousePressEvent (QMouseEvent *event)
+void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     if (!image->isNull ())
     {
@@ -53,7 +53,7 @@ void VertexEditorImage::mousePressEvent (QMouseEvent *event)
     }
 }
 
-void VertexEditorImage::paintEvent (QPaintEvent *event)
+void Aerodlyn::VertexEditorImage::paintEvent (QPaintEvent *event)
 {
     Q_UNUSED (event);
 
@@ -65,7 +65,7 @@ void VertexEditorImage::paintEvent (QPaintEvent *event)
     painter.drawRect (0, 0, width () - 1, height () - 1);
     painter.drawImage ((width () - image->width ()) / 2, (height () - image->height ()) / 2, *image);
 
-    painter.setPen (QColor ("#000000"));
+    painter.setPen (QColor ("#FFFFFF"));
     painter.setBrush (QBrush ("#FFFFFF"));
 
     if (size >= 6)

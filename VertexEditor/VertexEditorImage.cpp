@@ -48,6 +48,7 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
 {
     if (!image->isNull ())
     {
+        hoveredPointIndex = -1;
         for (int i = 0; i < POINTS_LIST.size (); i += 2)
         {
             const float x = POINTS_LIST.at (i), y = POINTS_LIST.at (i + 1);
@@ -56,9 +57,6 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
                 hoveredPointIndex = i / 2;
                 break;
             }
-
-            else
-                hoveredPointIndex = -1;
         }
 
         emit mouseHovered (hoveredPointIndex);

@@ -34,7 +34,7 @@ namespace Aerodlyn
      *  requires an array of points to create polygonal shapes.
      *
      * @author  Patrick Jahnig (Aerodlyn)
-     * @version 2018.05.30
+     * @version 2018.05.31
      */
     class VertexEditorWindow : public QMainWindow
     {
@@ -131,6 +131,15 @@ namespace Aerodlyn
              * @param currentRow The row (index) of the data set that was selected
              */
             void handleDataSelection (int currentRow);
+
+            /**
+             * Handles selecting the row of the table view that represents the point that the user is currently
+             *  hovering their mouse over. If the user is not hovering over a point, then the last added point is
+             *  highlighted in the table view.
+             *
+             * @param index - The index of the point that the mouse is hovering over, or -1 if no such point exists
+             */
+            void handleHoveredPoint (int index);
 
             /**
              * Handles opening a new image that the user can base their clicks upon. Replaces the previously

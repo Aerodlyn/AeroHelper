@@ -10,6 +10,9 @@
 #include <QVector>
 #include <QVectorIterator>
 
+#define INITIAL_NUM_COLUMNS 2
+#define INITIAL_NUM_ROWS    0
+
 namespace Aerodlyn
 {
     class VertexEditorTable : public QTableWidget
@@ -22,7 +25,7 @@ namespace Aerodlyn
 
             void resizeEvent (QResizeEvent *event) override final;
 
-            void setAssociatedPointList (QVector <float> *pointList);
+            void setAssociatedPointList (QVector <float> *pointList = nullptr);
             void update ();
 
         private:

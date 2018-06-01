@@ -1,6 +1,8 @@
 #ifndef VERTEXEDITORIMAGE_H
 #define VERTEXEDITORIMAGE_H
 
+#include <iostream>
+
 #include <QCursor>
 #include <QImage>
 #include <QMouseEvent>
@@ -8,6 +10,8 @@
 #include <QPoint>
 #include <QVector>
 #include <QWidget>
+
+#include "Root/Utils.h"
 
 namespace Aerodlyn
 {
@@ -17,7 +21,7 @@ namespace Aerodlyn
      *  specific VertexEditorImage instance).
      *
      * @author  Patrick Jahnig (psj516)
-     * @version 2018.05.30
+     * @version 2018.05.31
      */
     class VertexEditorImage : public QWidget
     {
@@ -48,11 +52,14 @@ namespace Aerodlyn
             void setImageFile (QString &filepath);
 
         protected:
-            void mousePressEvent (QMouseEvent *event) override;
-            void paintEvent (QPaintEvent *event) override;
+            void mouseMoveEvent (QMouseEvent *event) override final;
+            void mousePressEvent (QMouseEvent *event) override final;
+            void paintEvent (QPaintEvent *event) override final;
 
         private:
             const float POINT_RADIUS = 5.0f;
+
+            int hoveredPointIndex = -1;
 
             QImage *image;
 
@@ -70,6 +77,16 @@ namespace Aerodlyn
              * @param y The y coordinate of the mouse click
              */
             void mouseClicked (float x, float y);
+
+            /**
+             * Signals that the mouse has been moved within this VertexEditorImage instance, and
+             *  may be hovering over a data point. If so then index is the index of that point,
+             *  else index is -1.
+             *
+             * @param index - The index of the point being hovered over, else if no such point exists,
+             *                  -1.
+             */
+            void mouseHovered (int index);
     };
 }
 

@@ -1,6 +1,6 @@
 #include "VertexEditorTable.h"
 
-Aerodlyn::VertexEditorTable::VertexEditorTable (QWidget *parent) : QTableWidget (0, 2, parent)
+Aerodlyn::VertexEditorTable::VertexEditorTable (QWidget *parent) : QTableWidget (INITIAL_NUM_ROWS, INITIAL_NUM_COLUMNS, parent)
 {
     QStringList headerList;
     headerList.append (DATA_COLUMN_01_HEADER);
@@ -17,7 +17,6 @@ Aerodlyn::VertexEditorTable::~VertexEditorTable () {}
 
 void Aerodlyn::VertexEditorTable::resizeEvent (QResizeEvent *event)
 {
-    /*int vertHeaderWidth = verticalHeader ()->width (); */
     int columnWidth = event->size ().width () * 0.5;
 
     setColumnWidth (0, columnWidth);
@@ -29,11 +28,14 @@ void Aerodlyn::VertexEditorTable::setAssociatedPointList (QVector <float> *point
     this->clearContents ();
     this->pointList = pointList;
 
-    setRowCount (this->pointList->size () / 2);
-    for (int i = 0; i < rowCount (); i++)
+    if (pointList)
     {
-        setCellWidget (i, 0, new QLabel (QString::number (this->pointList->at (i * 2))));
-        setCellWidget (i, 1, new QLabel (QString::number (this->pointList->at ((i * 2) + 1))));
+        setRowCount (this->pointList->size () / 2);
+        for (int i = 0; i < rowCount (); i++)
+        {
+            setCellWidget (i, 0, new QLabel (QString::number (this->pointList->at (i * 2))));
+            setCellWidget (i, 1, new QLabel (QString::number (this->pointList->at ((i * 2) + 1))));
+        }
     }
 }
 

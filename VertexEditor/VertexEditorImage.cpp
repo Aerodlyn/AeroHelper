@@ -6,7 +6,7 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.05.30
+ * @version 2018.05.31
  */
 
 /**
@@ -23,6 +23,7 @@ Aerodlyn::VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <
     image = new QImage ();
 
     setMinimumWidth (300);
+    setMouseTracking (true);
 }
 
 /**
@@ -43,12 +44,36 @@ void Aerodlyn::VertexEditorImage::setImageFile (QString &filepath)
 }
 
 /* Protected Methods */
+void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
+{
+    if (!image->isNull ())
+    {
+        for (int i = 0; i < POINTS_LIST.size (); i += 2)
+        {
+            const float x = POINTS_LIST.at (i), y = POINTS_LIST.at (i + 1);
+            if (Utils::isInCircle (event->x (), event->y (), x, y, POINT_RADIUS))
+            {
+                hoveredPointIndex = i / 2;
+                break;
+            }
+
+            else
+                hoveredPointIndex = -1;
+        }
+
+        emit mouseHovered (hoveredPointIndex);
+        update ();
+    }
+}
+
 void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     if (!image->isNull ())
     {
-        // Look into handling floating points
+        // TODO: Look into handling floating points
         emit mouseClicked (event->x (), event->y ());
+        mouseMoveEvent (event);
+
         update ();
     }
 }
@@ -64,9 +89,7 @@ void Aerodlyn::VertexEditorImage::paintEvent (QPaintEvent *event)
     painter.setBrush (QBrush (painter.pen ().color ()));
     painter.drawRect (0, 0, width () - 1, height () - 1);
     painter.drawImage ((width () - image->width ()) / 2, (height () - image->height ()) / 2, *image);
-
     painter.setPen (QColor ("#FFFFFF"));
-    painter.setBrush (QBrush ("#FFFFFF"));
 
     if (size >= 6)
         painter.drawLine (POINTS_LIST.at (0), POINTS_LIST.at (1), POINTS_LIST.at (size - 2), POINTS_LIST.at (size - 1));
@@ -77,6 +100,12 @@ void Aerodlyn::VertexEditorImage::paintEvent (QPaintEvent *event)
 
         if (size >= 4 && i < size - 2)
             painter.drawLine (x, y, POINTS_LIST.at (i + 2), POINTS_LIST.at (i + 3));
+
+        if (hoveredPointIndex * 2 == i)
+            painter.setBrush (QBrush ("#000000"));
+
+        else
+            painter.setBrush (QBrush ("#FFFFFF"));
 
         painter.drawEllipse (x - POINT_RADIUS / 2.0f, y - POINT_RADIUS / 2.0f, POINT_RADIUS, POINT_RADIUS);
     }

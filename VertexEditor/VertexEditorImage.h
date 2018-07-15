@@ -5,13 +5,18 @@
 
 #include <QCursor>
 #include <QImage>
+#include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPoint>
+#include <QResizeEvent>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QVector>
 #include <QWidget>
 
 #include "Root/Utils.h"
+#include "VertexEditor/VertexEditorRenderedImage.h"
 
 namespace Aerodlyn
 {
@@ -21,9 +26,9 @@ namespace Aerodlyn
      *  specific VertexEditorImage instance).
      *
      * @author  Patrick Jahnig (psj516)
-     * @version 2018.05.31
+     * @version 2018.06.07
      */
-    class VertexEditorImage : public QWidget
+    class VertexEditorImage : public QScrollArea
     {
         Q_OBJECT
 
@@ -36,7 +41,7 @@ namespace Aerodlyn
              * @param pointList This represents the currently selected list of data points that this
              *                      VertexEditorImage instance should draw
              */
-            VertexEditorImage (QWidget *parent = nullptr, const QVector <float> &pointList = QVector <float> ());
+            VertexEditorImage (QWidget *parent = nullptr, const QVector <float> &pointsList = QVector <float> ());
 
             /**
              * Destroys the VertexEditorImage.
@@ -48,8 +53,14 @@ namespace Aerodlyn
              * Sets the image that is drawn to the one contained within the file at the given filepath.
              *
              * @param filepath The (full) filepath of the image file to set the image to draw
+             *
+             * @return True if the image was loaded and set, false otherwise
              */
-            void setImageFile (QString &filepath);
+            bool setImageFile (const QString &filepath);
+
+            void resizeEvent (QResizeEvent *event) override final;
+
+            const QPoint adjustedMousePosition (const QMouseEvent * const event);
 
         protected:
             void mouseMoveEvent (QMouseEvent *event) override final;
@@ -57,16 +68,15 @@ namespace Aerodlyn
             void paintEvent (QPaintEvent *event) override final;
 
         private:
-            const float POINT_RADIUS = 5.0f;
+            int                         hoveredPointIndex = -1;
 
-            int hoveredPointIndex = -1;
+            const float                 POINT_RADIUS = 5.0f;
 
-            QImage *image;
+            QPoint                      center;
+            VertexEditorRenderedImage   *image;
 
-            const QColor            BACKGROUND_COLOR = QColor ("#FF19B9");
-            const QVector <float>   &POINTS_LIST;
-
-            const QWidget PARENT;
+            const QWidget               PARENT;
+            const QVector <float>       &POINTS_LIST;
 
         signals:
             /**

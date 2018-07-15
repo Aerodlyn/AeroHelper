@@ -54,8 +54,8 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
 
     gridLayout = new QGridLayout ();
     gridLayout->setMargin (MARGIN);
-    gridLayout->setSpacing(SPACING);
-    gridLayout->setColumnStretch(0, 2);
+    gridLayout->setSpacing (SPACING);
+    gridLayout->setColumnStretch (0, 2);
     gridLayout->setColumnMinimumWidth (1, 275);
 
     dataSetVBox = new QVBoxLayout ();
@@ -78,7 +78,7 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
     deleteAllDataSets = new QPushButton ("Delete All Data Sets");
     dataSetVBox->addWidget (deleteAllDataSets);
 
-    gridLayout->addLayout(dataSetVBox, 0, 1);
+    gridLayout->addLayout (dataSetVBox, 0, 1);
 
     dataSetListWidget = new QListWidget ();
     gridLayout->addWidget (dataSetListWidget, 1, 1);

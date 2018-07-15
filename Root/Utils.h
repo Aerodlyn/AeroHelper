@@ -16,4 +16,4 @@ class Utils
         static QString getVersion ();
 };
 
-#endif
+#endif // UTILS_H

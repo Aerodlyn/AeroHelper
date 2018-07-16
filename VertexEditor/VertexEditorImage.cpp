@@ -6,34 +6,32 @@
  *  specific VertexEditorImage instance).
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.06.07
+ * @version 2018.07.15
  */
 
+/* Constructors/Deconstructors */
 /**
  * Creates a new VertexEditorImage instance with the optional QWidget as the parent.
  *
- * @param parent    The optional parent of this instance (though VertexEditorImage is
+ * @param parent    - The optional parent of this instance (though VertexEditorImage is
  *                      designed to be used with a VertexEditorWindow instance as a parent).
- * @param pointList This represents the currently selected list of data points that this
- *                      VertexEditorImage instance should draw
  */
-Aerodlyn::VertexEditorImage::VertexEditorImage (QWidget *parent, const QVector <float> &pointsList)
-    : QScrollArea (parent), PARENT (parent), POINTS_LIST (pointsList)
+Aerodlyn::VertexEditorImage::VertexEditorImage (QWidget *parent) : QScrollArea (parent), PARENT (parent)
 {
-    image = new VertexEditorRenderedImage (hoveredPointIndex, center, pointsList);
+    image = new VertexEditorRenderedImage (hoveredPointIndex, center);
 
     setMinimumWidth (300);
     setMouseTracking (true);
     setWidget (image);
-    // setWidgetResizable (true);
 }
 
 /**
- * Destroys the VertexEditorImage.
- *  NOTE: Most of the memory management is done by Qt.
+ * Destroys this {@link VertexEditorImage} instance.
+ *  NOTE: Most of the memory management is done by Qt. This is here in case it is needed later
  */
-Aerodlyn::VertexEditorImage::~VertexEditorImage () { /* delete image; */ }
+Aerodlyn::VertexEditorImage::~VertexEditorImage () {}
 
+/* Public Methods */
 /**
  * Sets the image that is drawn to the one contained within the file at the given filepath.
  *
@@ -43,8 +41,25 @@ Aerodlyn::VertexEditorImage::~VertexEditorImage () { /* delete image; */ }
  */
 bool Aerodlyn::VertexEditorImage::setImageFile (const QString &filepath) { return image->load (filepath); }
 
-void Aerodlyn::VertexEditorImage::resizeEvent (QResizeEvent *event) { image->resizeEvent (event); }
+/**
+ * Sets the point list to use for input handling and rendering.
+ *
+ * @param pointList - The pointer to the selected list of points, can be null
+ */
+void Aerodlyn::VertexEditorImage::setPointList (QVector <float> *pointList)
+{
+    this->pointList = pointList;
+    image->setPointList (this->pointList);
+}
 
+/**
+ * Returns the mouse position associated with the given {@link QMouseEvent} adjusted for the location
+ *  of the viewport.
+ *
+ * @param event - The QMouseEvent to get the mouse coordinates from
+ *
+ * @return The adjusted mouse position as a {@link QPoint} object
+ */
 const QPoint Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEvent * const event)
 {
     const int evtX = (event->x () + horizontalScrollBar()->value ()) - center.x (),
@@ -54,14 +69,20 @@ const QPoint Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEve
 }
 
 /* Protected Methods */
+/**
+ * See: https://doc.qt.io/qt-5/qwidget.html#mouseMoveEvent
+ */
 void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
 {
+    if (!pointList)
+        return;
+
     const QPoint adjPos = adjustedMousePosition (event);
 
     hoveredPointIndex = -1;
-    for (int i = 0; i < POINTS_LIST.size () && hoveredPointIndex == -1; i += 2)
+    for (int i = 0; i < pointList->size () && hoveredPointIndex == -1; i += 2)
     {
-        const float x = POINTS_LIST.at (i), y = POINTS_LIST.at (i + 1);
+        const float x = pointList->at (i), y = pointList->at (i + 1);
         if (Utils::isInCircle (adjPos.x (), adjPos.y (), x, y, POINT_RADIUS))
             hoveredPointIndex = i / 2;
     }
@@ -70,6 +91,9 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
     image->update ();
 }
 
+/**
+ * See: https://doc.qt.io/qt-5/qwidget.html#mousePressEvent
+ */
 void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     const QPoint adjPos = adjustedMousePosition (event);
@@ -81,35 +105,7 @@ void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
     image->update ();
 }
 
-void Aerodlyn::VertexEditorImage::paintEvent (QPaintEvent *event)
-{
-    Q_UNUSED (event);
-
-    /* int size = POINTS_LIST.size ();
-    QPainter painter (this);
-
-    painter.setPen (BACKGROUND_COLOR);
-    painter.setBrush (QBrush (painter.pen ().color ()));
-    painter.drawRect (0, 0, width () - 1, height () - 1);
-    painter.drawImage ((width () - image.width ()) / 2, (height () - image.height ()) / 2, image);
-    painter.setPen (QColor ("#FFFFFF"));
-
-    if (size >= 6)
-        painter.drawLine (POINTS_LIST.at (0), POINTS_LIST.at (1), POINTS_LIST.at (size - 2), POINTS_LIST.at (size - 1));
-
-    for (int i = 0; i < size; i += 2)
-    {
-        float x = POINTS_LIST.at (i), y = POINTS_LIST.at (i + 1);
-
-        if (size >= 4 && i < size - 2)
-            painter.drawLine (x, y, POINTS_LIST.at (i + 2), POINTS_LIST.at (i + 3));
-
-        if (hoveredPointIndex * 2 == i)
-            painter.setBrush (QBrush ("#000000"));
-
-        else
-            painter.setBrush (QBrush ("#FFFFFF"));
-
-        painter.drawEllipse (x - POINT_RADIUS / 2.0f, y - POINT_RADIUS / 2.0f, POINT_RADIUS, POINT_RADIUS);
-    } */
-}
+/**
+ * See: https://doc.qt.io/qt-5/qwidget.html#resizeEvent
+ */
+void Aerodlyn::VertexEditorImage::resizeEvent (QResizeEvent *event) { image->resizeToFit (event->size ()); }

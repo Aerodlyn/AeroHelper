@@ -10,32 +10,76 @@
 
 namespace Aerodlyn
 {
+    /**
+     * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the application
+     *  as well as the background that gets rendered behind that image.
+     *
+     * @author  Patrick Jahnig (psj516)
+     * @version 2018.07.15
+     */
     class VertexEditorRenderedImage : public QLabel
     {
-        public:
-            VertexEditorRenderedImage (int &hoveredPointIndex, QPoint &center, const QVector <float> &pointsList);
+        public: // Constructors/Deconstructors
+            /**
+             * Creates a new {@link VertexEditorRenderedImage} instance, with the given references. These references
+             *  are designed to be contained within the parent {@link VertexEditorImage} instance.
+             *
+             * @param hoveredPointIndex - The integer representing the index of the point that the user is currently
+             *                              hovering over
+             * @param center            - The current center of the rendered area, used for determining the location
+             *                              to render points by relative to that center (as some coordinates may be
+             *                              negative)
+             */
+            VertexEditorRenderedImage (int &hoveredPointIndex, QPoint &center);
 
+            /**
+             * Destroys this {@link VertexEditorRenderedImage} instance.
+             *  NOTE: Most of the memory management is done by Qt. This is here in case it is needed later
+             */
             ~VertexEditorRenderedImage ();
 
+        public: // Methods
+            /**
+             * Loads the image located at the given filepath and sets it as the image to render.
+             *
+             * @param filepath  - The (absolute) filepath of the image to load
+             *
+             * @return True if the image was loaded, false otherwise
+             */
             bool load (const QString &filepath);
 
-            void resizeEvent (QResizeEvent *event) override final;
+            /**
+             * Resizes this {@link VertexEditorRenderedImage} instance to either the dimensions of the parent
+             *  or the image, whichever is larger. The width of this instance may be from the parent while the
+             *  height may be from the image, or vice versa.
+             *
+             * @param size  - The size of the resized parent widget
+             */
+            void resizeToFit (const QSize &size);
 
-        protected:
+            /**
+             * Sets the point list to use for input handling and rendering.
+             *
+             * @param pointList - The pointer to the selected list of points, can be null
+             */
+            void setPointList (QVector <float> *pointList);
+
+        protected: // Methods
+            /**
+             * See: https://doc.qt.io/qt-5/qwidget.html#paintEvent
+             */
             void paintEvent (QPaintEvent *event) override final;
 
-        private:
-            int                     &hoveredPointIndex;
+        private: // Variables
+            int                             &hoveredPointIndex;
 
-            const float             POINT_RADIUS = 5.0f;
+            const float                     POINT_RADIUS = 5.0f;
 
-            QImage                  image;
-            QPoint                  &center;
+            QImage                          image;
+            QPoint                          &center;
+            QVector <float>                 *pointList;
 
-            const QColor            BACKGROUND_COLOR = QColor ("#FF19B9");
-            const QVector <float>   &POINTS_LIST;
-
-            void resizeToFit (const QSize &size);
+            const QColor                    BACKGROUND_COLOR = QColor ("#FF19B9");
     };
 }
 

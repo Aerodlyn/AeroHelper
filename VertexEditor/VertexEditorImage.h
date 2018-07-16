@@ -1,8 +1,6 @@
 #ifndef VERTEXEDITORIMAGE_H
 #define VERTEXEDITORIMAGE_H
 
-#include <iostream>
-
 #include <QCursor>
 #include <QImage>
 #include <QLabel>
@@ -26,65 +24,88 @@ namespace Aerodlyn
      *  specific VertexEditorImage instance).
      *
      * @author  Patrick Jahnig (psj516)
-     * @version 2018.06.07
+     * @version 2018.07.15
      */
     class VertexEditorImage : public QScrollArea
     {
         Q_OBJECT
 
-        public:
+        public: // Constructors/Deconstructors
             /**
              * Creates a new VertexEditorImage instance with the optional QWidget as the parent.
              *
-             * @param parent    The optional parent of this instance (though VertexEditorImage is
+             * @param parent    - The optional parent of this instance (though VertexEditorImage is
              *                      designed to be used with a VertexEditorWindow instance as a parent).
-             * @param pointList This represents the currently selected list of data points that this
-             *                      VertexEditorImage instance should draw
              */
-            VertexEditorImage (QWidget *parent = nullptr, const QVector <float> &pointsList = QVector <float> ());
+            VertexEditorImage (QWidget *parent = nullptr);
 
             /**
-             * Destroys the VertexEditorImage.
-             *  NOTE: Most of the memory management is done by Qt.
+             * Destroys this {@link VertexEditorImage} instance.
+             *  NOTE: Most of the memory management is done by Qt. This is here in case it is needed later
              */
             ~VertexEditorImage ();
 
+        public: // Methods
             /**
              * Sets the image that is drawn to the one contained within the file at the given filepath.
              *
-             * @param filepath The (full) filepath of the image file to set the image to draw
+             * @param filepath  - The (full) filepath of the image file to set the image to draw
              *
              * @return True if the image was loaded and set, false otherwise
              */
             bool setImageFile (const QString &filepath);
 
-            void resizeEvent (QResizeEvent *event) override final;
+            /**
+             * Sets the point list to use for input handling and rendering.
+             *
+             * @param pointList - The pointer to the selected list of points, can be null
+             */
+            void setPointList (QVector <float> *pointList);
 
+            /**
+             * Returns the mouse position associated with the given {@link QMouseEvent} adjusted for the location
+             *  of the viewport.
+             *
+             * @param event - The QMouseEvent to get the mouse coordinates from
+             *
+             * @return The adjusted mouse position as a {@link QPoint} object
+             */
             const QPoint adjustedMousePosition (const QMouseEvent * const event);
 
-        protected:
+        protected: // Methods
+            /**
+             * See: https://doc.qt.io/qt-5/qwidget.html#mouseMoveEvent
+             */
             void mouseMoveEvent (QMouseEvent *event) override final;
-            void mousePressEvent (QMouseEvent *event) override final;
-            void paintEvent (QPaintEvent *event) override final;
 
-        private:
+            /**
+             * See: https://doc.qt.io/qt-5/qwidget.html#mousePressEvent
+             */
+            void mousePressEvent (QMouseEvent *event) override final;
+
+            /**
+             * See: https://doc.qt.io/qt-5/qwidget.html#resizeEvent
+             */
+            void resizeEvent (QResizeEvent *event) override final;
+
+        private: // Variables
             int                         hoveredPointIndex = -1;
 
             const float                 POINT_RADIUS = 5.0f;
 
             QPoint                      center;
+            QVector <float>             *pointList;
             VertexEditorRenderedImage   *image;
 
             const QWidget               PARENT;
-            const QVector <float>       &POINTS_LIST;
 
         signals:
             /**
              * Signals that the mouse has been clicked within this VertexEditorImage instance, and
              *  passes the location of that click to the slot that is connected to this method.
              *
-             * @param x The x coordinate of the mouse click
-             * @param y The y coordinate of the mouse click
+             * @param x - The x coordinate of the mouse click
+             * @param y - The y coordinate of the mouse click
              */
             void mouseClicked (float x, float y);
 
@@ -100,4 +121,4 @@ namespace Aerodlyn
     };
 }
 
-#endif
+#endif // VERTEXEDITORIMAGE_H

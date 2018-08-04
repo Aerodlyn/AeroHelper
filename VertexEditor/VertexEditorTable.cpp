@@ -28,28 +28,37 @@ void Aerodlyn::VertexEditorTable::setAssociatedPointList (QVector <float> *point
     this->clearContents ();
     this->pointList = pointList;
 
-    if (pointList)
-    {
-        setRowCount (this->pointList->size () / 2);
-        for (int i = 0; i < rowCount (); i++)
-        {
-            setCellWidget (i, 0, new QLabel (QString::number (this->pointList->at (i * 2))));
-            setCellWidget (i, 1, new QLabel (QString::number (this->pointList->at ((i * 2) + 1))));
-        }
-    }
+    update (true);
 }
 
-void Aerodlyn::VertexEditorTable::update ()
+/**
+ * Updates the table, either by updating the last row (i.e. a new data point as been
+ *  added) or the entire table (a new point list has been set).
+ *
+ * @param refresh - True if the entire table must be updated, false otherwise
+ */
+void Aerodlyn::VertexEditorTable::update (const bool refresh)
 {
     if (!pointList)
         return;
 
-    int oldRowCount = rowCount ();
+    int index = refresh ? 0 : rowCount ();
     setRowCount (pointList->size () / 2);
 
-    for (int i = oldRowCount; i < rowCount (); i++)
-    {
-        setCellWidget (i, 0, new QLabel (QString::number (this->pointList->at (i * 2))));
-        setCellWidget (i, 1, new QLabel (QString::number (this->pointList->at ((i * 2) + 1))));
-    }
+    for (; index < rowCount (); index++)
+        update (index);
+}
+
+/**
+ * Updates a specific row in the table to reflect new information.
+ *
+ * @param row - The row to update
+ */
+void Aerodlyn::VertexEditorTable::update (const int row)
+{
+    if (!pointList)
+        return;
+
+    setCellWidget (row, 0, new QLabel (QString::number (this->pointList->at (row * 2))));
+    setCellWidget (row, 1, new QLabel (QString::number (this->pointList->at ((row * 2) + 1))));
 }

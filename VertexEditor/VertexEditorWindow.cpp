@@ -87,12 +87,14 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
     vertexTable = new Aerodlyn::VertexEditorTable ();
     gridLayout->addWidget (vertexTable, 2, 1);
 
-    vertexImage = new Aerodlyn::VertexEditorImage (this, currentDataSetPoints);
+    vertexImage = new Aerodlyn::VertexEditorImage (this);
     gridLayout->addWidget (vertexImage, 0, 0, gridLayout->rowCount (), 1);
     connect (vertexImage, &Aerodlyn::VertexEditorImage::mouseClicked, this,
              &Aerodlyn::VertexEditorWindow::addPointToSelectedDataSet);
     connect (vertexImage, &Aerodlyn::VertexEditorImage::mouseHovered, this,
              &Aerodlyn::VertexEditorWindow::handleHoveredPoint);
+    connect (vertexImage, &Aerodlyn::VertexEditorImage::mouseMoved, this,
+             &Aerodlyn::VertexEditorWindow::handleMouseMoved);
 
     centralWidget->setLayout (gridLayout);
     resize (minimumSize ());
@@ -118,10 +120,10 @@ void Aerodlyn::VertexEditorWindow::addPointToSelectedDataSet (const float x, con
 {
     if (dataSetListWidget->selectedItems ().size () > 0)
     {
-        currentDataSetPoints.append (x);
-        currentDataSetPoints.append (y);
+        currentDataSetPoints->append (x);
+        currentDataSetPoints->append (y);
 
-        *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+        // *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
         vertexTable->update ();
     }
 }
@@ -173,8 +175,8 @@ void Aerodlyn::VertexEditorWindow::handleClearDataSet ()
 {
     if (selectedDataSetIndex != -1)
     {
-        currentDataSetPoints.clear ();
-        *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+        currentDataSetPoints->clear ();
+        // *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
 
         vertexImage->update ();
         vertexTable->update ();
@@ -191,7 +193,8 @@ void Aerodlyn::VertexEditorWindow::handleClearAllDataSets ()
 
     if (selectedDataSetIndex != -1)
     {
-        currentDataSetPoints.clear ();
+        currentDataSetPoints->clear ();
+
         vertexImage->update ();
         vertexTable->update ();
     }
@@ -206,9 +209,10 @@ void Aerodlyn::VertexEditorWindow::handleClearAllDataSets ()
 void Aerodlyn::VertexEditorWindow::handleDataSelection (int currentRow)
 {
     selectedDataSetIndex = currentRow;
-    currentDataSetPoints = *(dataSets.data () + currentRow);
+    currentDataSetPoints = dataSets.data () + currentRow;
 
-    vertexTable->setAssociatedPointList (&currentDataSetPoints);
+    vertexTable->setAssociatedPointList (currentDataSetPoints);
+    vertexImage->setPointList (currentDataSetPoints);
     vertexImage->update ();
 }
 
@@ -226,6 +230,22 @@ void Aerodlyn::VertexEditorWindow::handleHoveredPoint (int index)
 
     else
         vertexTable->selectRow (vertexTable->rowCount () - 1);
+}
+
+/**
+ * Handles moving a hovered point as the user clicks and drags.
+ *
+ * @param x     - The x coordinate of the mouse click
+ * @param y     - The y coordinate of the mouse click
+ * @param index - The index of the point being hovered over
+ */
+void Aerodlyn::VertexEditorWindow::handleMouseMoved (const float x, const float y, const int index)
+{
+    int adjIndex = index * 2;
+    currentDataSetPoints->data () [adjIndex] = x;
+    currentDataSetPoints->data () [adjIndex + 1] = y;
+
+    vertexTable->update (index);
 }
 
 /**

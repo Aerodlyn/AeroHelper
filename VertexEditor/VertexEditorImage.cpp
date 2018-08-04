@@ -1,12 +1,11 @@
 #include "VertexEditorImage.h"
 
 /**
- * Designed to be a subcomponent of a VertexEditorWindow instance, this class handles the drawing
- *  of an image as well as the vertex points of a selected data set (given from the owner of this
- *  specific VertexEditorImage instance).
+ * Designed to be a subcomponent of a VertexEditorWindow instance, this class handles user input
+ *  related to a drawn image.
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.07.15
+ * @version 2018.08.03
  */
 
 /* Constructors/Deconstructors */
@@ -18,7 +17,7 @@
  */
 Aerodlyn::VertexEditorImage::VertexEditorImage (QWidget *parent) : QScrollArea (parent), PARENT (parent)
 {
-    image = new VertexEditorRenderedImage (hoveredPointIndex, center);
+    image = new VertexEditorRenderedImage (selectedPointIndex, center);
 
     setMinimumWidth (300);
     setMouseTracking (true);
@@ -52,6 +51,8 @@ void Aerodlyn::VertexEditorImage::setPointList (QVector <float> *pointList)
     image->setPointList (this->pointList);
 }
 
+void Aerodlyn::VertexEditorImage::update () { image->update (); }
+
 /**
  * Returns the mouse position associated with the given {@link QMouseEvent} adjusted for the location
  *  of the viewport.
@@ -68,7 +69,7 @@ const QPoint Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEve
     return QPoint (evtX, evtY);
 }
 
-/* Protected Methods */
+/* Overridden Protected Methods */
 /**
  * See: https://doc.qt.io/qt-5/qwidget.html#mouseMoveEvent
  */
@@ -78,16 +79,26 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
         return;
 
     const QPoint adjPos = adjustedMousePosition (event);
-
-    hoveredPointIndex = -1;
-    for (int i = 0; i < pointList->size () && hoveredPointIndex == -1; i += 2)
+    if (!leftButtonHeld)
     {
-        const float x = pointList->at (i), y = pointList->at (i + 1);
-        if (Utils::isInCircle (adjPos.x (), adjPos.y (), x, y, POINT_RADIUS))
-            hoveredPointIndex = i / 2;
+        selectedPointIndex = -1;
+        for (int i = 0; i < pointList->size () && selectedPointIndex == -1; i += 2)
+        {
+            const float x = pointList->at (i), y = pointList->at (i + 1);
+            if (Utils::isInCircle (adjPos.x (), adjPos.y (), x, y, POINT_RADIUS))
+                selectedPointIndex = i / 2;
+        }
     }
 
-    emit mouseHovered (hoveredPointIndex);
+    // TODO: Selected point index to prevent losing the point being dragged
+    if (selectedPointIndex != -1)
+    {
+        emit mouseHovered (selectedPointIndex);
+
+        if (leftButtonHeld)
+            emit mouseMoved (adjPos.x (), adjPos.y (), selectedPointIndex);
+    }
+
     image->update ();
 }
 
@@ -97,12 +108,22 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
 void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
     const QPoint adjPos = adjustedMousePosition (event);
+    leftButtonHeld = true;
 
-    // TODO: Look into handling floating points
-    emit mouseClicked (adjPos.x (), adjPos.y ());
-    mouseMoveEvent (event);
+    if (selectedPointIndex == -1)
+        // TODO: Look into handling floating points
+        emit mouseClicked (adjPos.x (), adjPos.y ());
 
     image->update ();
+}
+
+/**
+ * See: https://doc.qt.io/qt-5/qwidget.html#mouseReleaseEvent
+ */
+void Aerodlyn::VertexEditorImage::mouseReleaseEvent (QMouseEvent *event)
+{
+    Q_UNUSED (event);
+    leftButtonHeld = false;
 }
 
 /**

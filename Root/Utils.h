@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <iostream>
 
 #include <QApplication>
 #include <QTextStream>

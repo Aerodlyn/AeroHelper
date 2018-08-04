@@ -1,18 +1,26 @@
 #include "VertexEditor/VertexEditorRenderedImage.h"
 
+/**
+ * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the
+ *  application as well as the background that gets rendered behind that image.
+ *
+ * @author  Patrick Jahnig (psj516)
+ * @version 2018.08.03
+ */
+
 /* Constructors/Deconstructors */
 /**
- * Creates a new {@link VertexEditorRenderedImage} instance, with the given references. These references
- *  are designed to be contained within the parent {@link VertexEditorImage} instance.
+ * Creates a new {@link VertexEditorRenderedImage} instance, with the given references. These
+ *  references are designed to be contained within the parent {@link VertexEditorImage} instance.
  *
- * @param hoveredPointIndex - The integer representing the index of the point that the user is currently
- *                              hovering over
- * @param center            - The current center of the rendered area, used for determining the location
- *                              to render points by relative to that center (as some coordinates may be
- *                              negative)
+ * @param selectedPointIndex    - The integer representing the index of the point that the user has
+ *                                  selected
+ * @param center                - The current center of the rendered area, used for determining the
+ *                                  location to render points by relative to that center (as some
+ *                                  coordinates may be negative)
  */
-Aerodlyn::VertexEditorRenderedImage::VertexEditorRenderedImage (int &hoveredPointIndex, QPoint &center)
-    : QLabel (nullptr), hoveredPointIndex (hoveredPointIndex), center (center)
+Aerodlyn::VertexEditorRenderedImage::VertexEditorRenderedImage (int &selectedPointIndex, QPoint &center)
+    : QLabel (nullptr), selectedPointIndex (selectedPointIndex), center (center)
 {
     setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored);
     setScaledContents (true);
@@ -110,7 +118,7 @@ void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
         if (size >= 4 && i < size - 2)
             painter.drawLine (x, y, pointList->at (i + 2) + center.x (), pointList->at (i + 3) + center.y ());
 
-        if (hoveredPointIndex * 2 == i)
+        if (selectedPointIndex * 2 == i)
             painter.setBrush (QBrush ("#000000"));
 
         else

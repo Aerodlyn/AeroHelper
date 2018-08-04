@@ -11,26 +11,26 @@
 namespace Aerodlyn
 {
     /**
-     * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the application
-     *  as well as the background that gets rendered behind that image.
+     * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the
+     *  application as well as the background that gets rendered behind that image.
      *
      * @author  Patrick Jahnig (psj516)
-     * @version 2018.07.15
+     * @version 2018.08.03
      */
     class VertexEditorRenderedImage : public QLabel
     {
         public: // Constructors/Deconstructors
             /**
-             * Creates a new {@link VertexEditorRenderedImage} instance, with the given references. These references
-             *  are designed to be contained within the parent {@link VertexEditorImage} instance.
+             * Creates a new {@link VertexEditorRenderedImage} instance, with the given references. These
+             *  references are designed to be contained within the parent {@link VertexEditorImage} instance.
              *
-             * @param hoveredPointIndex - The integer representing the index of the point that the user is currently
-             *                              hovering over
-             * @param center            - The current center of the rendered area, used for determining the location
-             *                              to render points by relative to that center (as some coordinates may be
-             *                              negative)
+             * @param selectedPointIndex    - The integer representing the index of the point that the user has
+             *                                  selected
+             * @param center                - The current center of the rendered area, used for determining the
+             *                                  location to render points by relative to that center (as some
+             *                                  coordinates may be negative)
              */
-            VertexEditorRenderedImage (int &hoveredPointIndex, QPoint &center);
+            VertexEditorRenderedImage (int &selectedPointIndex, QPoint &center);
 
             /**
              * Destroys this {@link VertexEditorRenderedImage} instance.
@@ -71,13 +71,13 @@ namespace Aerodlyn
             void paintEvent (QPaintEvent *event) override final;
 
         private: // Variables
-            int                             &hoveredPointIndex;
+            int                             &selectedPointIndex;
 
             const float                     POINT_RADIUS = 5.0f;
 
             QImage                          image;
             QPoint                          &center;
-            QVector <float>                 *pointList;
+            QVector <float>                 *pointList  = nullptr;
 
             const QColor                    BACKGROUND_COLOR = QColor ("#FF19B9");
     };

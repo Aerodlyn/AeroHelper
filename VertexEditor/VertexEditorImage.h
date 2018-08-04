@@ -24,7 +24,7 @@ namespace Aerodlyn
      *  specific VertexEditorImage instance).
      *
      * @author  Patrick Jahnig (psj516)
-     * @version 2018.07.15
+     * @version 2018.08.03
      */
     class VertexEditorImage : public QScrollArea
     {
@@ -62,6 +62,8 @@ namespace Aerodlyn
              */
             void setPointList (QVector <float> *pointList);
 
+            void update ();
+
             /**
              * Returns the mouse position associated with the given {@link QMouseEvent} adjusted for the location
              *  of the viewport.
@@ -84,17 +86,23 @@ namespace Aerodlyn
             void mousePressEvent (QMouseEvent *event) override final;
 
             /**
+             * See: https://doc.qt.io/qt-5/qwidget.html#mouseReleaseEvent
+             */
+            void mouseReleaseEvent (QMouseEvent *event) override final;
+
+            /**
              * See: https://doc.qt.io/qt-5/qwidget.html#resizeEvent
              */
             void resizeEvent (QResizeEvent *event) override final;
 
         private: // Variables
-            int                         hoveredPointIndex = -1;
+            bool                        leftButtonHeld;
+            int                         selectedPointIndex  = -1;
 
-            const float                 POINT_RADIUS = 5.0f;
+            const float                 POINT_RADIUS        = 5.0f;
 
             QPoint                      center;
-            QVector <float>             *pointList;
+            QVector <float>             *pointList          = nullptr;
             VertexEditorRenderedImage   *image;
 
             const QWidget               PARENT;
@@ -118,6 +126,15 @@ namespace Aerodlyn
              *                  -1.
              */
             void mouseHovered (int index);
+
+            /**
+             * Signals that the mouse is hovering a point and clicks, and drags.
+             *
+             * @param x     - The x coordinate of the mouse click
+             * @param y     - The y coordinate of the mouse click
+             * @param index - The index of the point being hovered over
+             */
+            void mouseMoved (const float x, const float y, const int index);
     };
 }
 

@@ -56,9 +56,9 @@ namespace Aerodlyn
             ~VertexEditorWindow ();
 
         private:
-            int selectedDataSetIndex;
+            int                         selectedDataSetIndex;
 
-            const unsigned int MARGIN = 5, SPACING = 5;
+            const unsigned int          MARGIN = 5, SPACING = 5;
 
             QAction                     *loadImageAction, *quitAction, *saveDataAction;
             QGridLayout                 *gridLayout;
@@ -69,12 +69,12 @@ namespace Aerodlyn
                                             *deleteDataSet, *deleteAllDataSets;
             QString                     lastOpenedDirPath = QDir::homePath ();
             QVBoxLayout                 *dataSetVBox;
-            QVector <float>             currentDataSetPoints;
+            QVector <float>             *currentDataSetPoints = nullptr;
             QVector <QVector <float>>   dataSets;
             QWidget                     *centralWidget;
 
-            VertexEditorImage   *vertexImage = nullptr;
-            VertexEditorTable   *vertexTable = nullptr;
+            VertexEditorImage           *vertexImage = nullptr;
+            VertexEditorTable           *vertexTable = nullptr;
 
             const QString DATA_COLUMN_01_HEADER         = "X", DATA_COLUMN_02_HEADER = "Y";
             const QString DATA_SET_INPUT_DIALOG_HEADER  = "Enter name of data set",
@@ -84,7 +84,7 @@ namespace Aerodlyn
                                                             " (';').";
             const QString FILE_INPUT_HEADER             = "Open Image",
                             FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
-            const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.02.28";
+            const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.08.03";
 
             /**
              * Adds the given coordinates to the data table that represents the data of the currently
@@ -140,6 +140,15 @@ namespace Aerodlyn
              * @param index - The index of the point that the mouse is hovering over, or -1 if no such point exists
              */
             void handleHoveredPoint (int index);
+
+            /**
+             * Handles moving a hovered point as the user clicks and drags.
+             *
+             * @param x     - The x coordinate of the mouse click
+             * @param y     - The y coordinate of the mouse click
+             * @param index - The index of the point being hovered over
+             */
+            void handleMouseMoved (const float x, const float y, const int index);
 
             /**
              * Handles opening a new image that the user can base their clicks upon. Replaces the previously

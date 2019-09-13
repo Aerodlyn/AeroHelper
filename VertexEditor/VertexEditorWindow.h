@@ -40,7 +40,7 @@ namespace Aerodlyn
     {
         Q_OBJECT
 
-        public:
+        public: // Constructors/Deconstructors
             /**
              * Creates the VertexEditorWindow with the optional QWidget as its parent.
              *
@@ -55,7 +55,7 @@ namespace Aerodlyn
              */
             ~VertexEditorWindow ();
 
-        private:
+        private: // Variables
             int                         selectedDataSetIndex;
 
             const unsigned int          MARGIN = 5, SPACING = 5;
@@ -86,6 +86,7 @@ namespace Aerodlyn
                             FILE_INPUT_FILE_TYPES       = "Images (*jpeg *jpg *.png)";
             const QString WINDOW_TITLE                  = "Vertex Editor | Ver. 2018.08.03";
 
+        private: // Methods
             /**
              * Adds the given coordinates to the data table that represents the data of the currently
              *  selected data set. The data will be added at the given row index.

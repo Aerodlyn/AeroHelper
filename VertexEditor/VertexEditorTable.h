@@ -22,7 +22,7 @@ namespace Aerodlyn
     {
         public: // Constructors/Deconstructors
             VertexEditorTable (QWidget *parent = nullptr);
-            ~VertexEditorTable ();
+            ~VertexEditorTable () override;
 
         public: // Methods
             void setAssociatedPointList (QVector <float> *pointList = nullptr);

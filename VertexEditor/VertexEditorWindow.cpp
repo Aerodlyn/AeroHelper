@@ -8,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2018.05.31
+ * @version 2019.09.12
  */
 
 /* Constructors/Deconstructors */
@@ -19,39 +19,8 @@
  */
 Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow (parent), selectedDataSetIndex (-1)
 {
-    // Or perhaps this
     centralWidget = new QWidget ();
     setCentralWidget (centralWidget);
-
-    // This might be the issue on Linux
-    fileMenu = menuBar ()->addMenu ("&File");
-
-    QList <QKeySequence> loadShortcuts = QList <QKeySequence> ();
-    loadShortcuts.append (QKeySequence ("Ctrl+L"));
-    loadShortcuts.append (QKeySequence ("Cmd+L"));
-
-    loadImageAction = new QAction ("&Load Image");
-    loadImageAction->setShortcuts (loadShortcuts);
-    fileMenu->addAction (loadImageAction);
-    connect (loadImageAction, &QAction::triggered, this, &VertexEditorWindow::handleOpenImage);
-
-    QList <QKeySequence> saveShortcuts = QList <QKeySequence> ();
-    saveShortcuts.append (QKeySequence ("Ctrl+S"));
-    saveShortcuts.append (QKeySequence ("Cmd+S"));
-
-    saveDataAction = new QAction ("Save Data Sets");
-    saveDataAction->setShortcuts (saveShortcuts);
-    fileMenu->addAction (saveDataAction);
-    connect (saveDataAction, &QAction::triggered, this, &VertexEditorWindow::handleSaveDataSets);
-
-    QList <QKeySequence> quitShortcuts = QList <QKeySequence> ();
-    quitShortcuts.append (QKeySequence ("Ctrl+Q"));
-    quitShortcuts.append (QKeySequence ("Cmd+Q"));
-
-    quitAction = new QAction ("&Quit");
-    quitAction->setShortcuts (quitShortcuts);
-    fileMenu->addAction (quitAction);
-    connect (quitAction, &QAction::triggered, this, &VertexEditorWindow::handleQuit);
 
     gridLayout = new QGridLayout ();
     gridLayout->setMargin (static_cast <int> (MARGIN));
@@ -98,6 +67,38 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
              &Aerodlyn::VertexEditorWindow::handleMouseMoved);
 
     centralWidget->setLayout (gridLayout);
+
+    // Create menu bar
+    fileMenu = menuBar ()->addMenu ("&File");
+
+    QList <QKeySequence> loadShortcuts = QList <QKeySequence> ();
+    loadShortcuts.append (QKeySequence ("Ctrl+L"));
+    loadShortcuts.append (QKeySequence ("Cmd+L"));
+
+    loadImageAction = new QAction ("&Load Image");
+    loadImageAction->setShortcuts (loadShortcuts);
+    fileMenu->addAction (loadImageAction);
+    connect (loadImageAction, &QAction::triggered, this, &VertexEditorWindow::handleOpenImage);
+
+    QList <QKeySequence> saveShortcuts = QList <QKeySequence> ();
+    saveShortcuts.append (QKeySequence ("Ctrl+S"));
+    saveShortcuts.append (QKeySequence ("Cmd+S"));
+
+    saveDataAction = new QAction ("Save Data Sets");
+    saveDataAction->setShortcuts (saveShortcuts);
+    fileMenu->addAction (saveDataAction);
+    connect (saveDataAction, &QAction::triggered, this, &VertexEditorWindow::handleSaveDataSets);
+
+    QList <QKeySequence> quitShortcuts = QList <QKeySequence> ();
+    quitShortcuts.append (QKeySequence ("Ctrl+Q"));
+    quitShortcuts.append (QKeySequence ("Cmd+Q"));
+
+    quitAction = new QAction ("&Quit");
+    quitAction->setShortcuts (quitShortcuts);
+    fileMenu->addAction (quitAction);
+    connect (quitAction, &QAction::triggered, this, &VertexEditorWindow::handleQuit);
+
+    // Set minimum size and set it as the initial size
     resize (minimumSize ());
     setWindowTitle (WINDOW_TITLE);
 }

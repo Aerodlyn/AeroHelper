@@ -122,7 +122,7 @@ void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
  */
 void Aerodlyn::VertexEditorImage::mouseReleaseEvent (QMouseEvent *event)
 {
-    Q_UNUSED (event);
+    Q_UNUSED (event)
     leftButtonHeld = false;
 }
 

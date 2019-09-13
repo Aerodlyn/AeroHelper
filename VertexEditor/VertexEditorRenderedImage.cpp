@@ -86,13 +86,13 @@ void Aerodlyn::VertexEditorRenderedImage::resizeToFit (const QSize &size)
  */
 void Aerodlyn::VertexEditorRenderedImage::setPointList (QVector <float> *pointList) { this->pointList = pointList; }
 
-/* Protected Methods */
+/* Overridden Protected Methods */
 /**
  * See: https://doc.qt.io/qt-5/qwidget.html#paintEvent
  */
 void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
 {
-    Q_UNUSED (event);
+    Q_UNUSED (event)
 
     QPainter painter (this);
     painter.setPen (BACKGROUND_COLOR);
@@ -107,8 +107,8 @@ void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
 
     painter.setPen (QColor ("#FFFFFF"));
     if (size >= 6)
-        painter.drawLine (pointList->at (0) + center.x (), pointList->at (1) + center.y (),
-                          pointList->at (size - 2) + center.x (), pointList->at (size - 1) + center.y ());
+        painter.drawLine (static_cast <int> (pointList->at (0) + center.x ()), static_cast <int> (pointList->at (1) + center.y ()),
+                          static_cast <int> (pointList->at (size - 2) + center.x ()), static_cast <int> (pointList->at (size - 1) + center.y ()));
 
     for (int i = 0; i < size; i += 2)
     {
@@ -116,7 +116,8 @@ void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
                     y = pointList->at (i + 1) + center.y ();
 
         if (size >= 4 && i < size - 2)
-            painter.drawLine (x, y, pointList->at (i + 2) + center.x (), pointList->at (i + 3) + center.y ());
+            painter.drawLine (static_cast <int> (x), static_cast <int> (y),
+                              static_cast <int> (pointList->at (i + 2) + center.x ()), static_cast <int> (pointList->at (i + 3) + center.y ()));
 
         if (selectedPointIndex * 2 == i)
             painter.setBrush (QBrush ("#000000"));
@@ -124,6 +125,7 @@ void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
         else
             painter.setBrush (QBrush ("#FFFFFF"));
 
-        painter.drawEllipse (x - POINT_RADIUS / 2.0f, y - POINT_RADIUS / 2.0f, POINT_RADIUS, POINT_RADIUS);
+        painter.drawEllipse (static_cast <int> (x - POINT_RADIUS / 2.0f), static_cast <int> (y - POINT_RADIUS / 2.0f),
+                             static_cast <int> (POINT_RADIUS), static_cast <int> (POINT_RADIUS));
     }
 }

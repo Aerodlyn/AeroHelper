@@ -43,7 +43,7 @@ namespace Aerodlyn
              * Destroys this {@link VertexEditorImage} instance.
              *  NOTE: Most of the memory management is done by Qt. This is here in case it is needed later
              */
-            ~VertexEditorImage ();
+            ~VertexEditorImage () override;
 
         public: // Methods
             /**

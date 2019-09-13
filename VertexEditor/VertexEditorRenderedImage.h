@@ -36,7 +36,7 @@ namespace Aerodlyn
              * Destroys this {@link VertexEditorRenderedImage} instance.
              *  NOTE: Most of the memory management is done by Qt. This is here in case it is needed later
              */
-            ~VertexEditorRenderedImage ();
+            ~VertexEditorRenderedImage () override;
 
         public: // Methods
             /**
@@ -73,13 +73,13 @@ namespace Aerodlyn
         private: // Variables
             int                             &selectedPointIndex;
 
-            const float                     POINT_RADIUS = 5.0f;
+            const float                     POINT_RADIUS            = 5.0f;
 
             QImage                          image;
             QPoint                          &center;
-            QVector <float>                 *pointList  = nullptr;
+            QVector <float>                 *pointList              = nullptr;
 
-            const QColor                    BACKGROUND_COLOR = QColor ("#FF19B9");
+            const QColor                    BACKGROUND_COLOR        = QColor ("#FF19B9");
     };
 }
 

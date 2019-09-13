@@ -11,6 +11,7 @@
  * @version 2018.05.31
  */
 
+/* Constructors/Deconstructors */
 /**
  * Creates the VertexEditorWindow with the optional QWidget as its parent.
  *
@@ -53,8 +54,8 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
     connect (quitAction, &QAction::triggered, this, &VertexEditorWindow::handleQuit);
 
     gridLayout = new QGridLayout ();
-    gridLayout->setMargin (MARGIN);
-    gridLayout->setSpacing (SPACING);
+    gridLayout->setMargin (static_cast <int> (MARGIN));
+    gridLayout->setSpacing (static_cast <int> (SPACING));
     gridLayout->setColumnStretch (0, 2);
     gridLayout->setColumnMinimumWidth (1, 275);
 

@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
+CONFIG += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,17 +28,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 !include (Files.pri) {
     message ("Error including header files")
 }
-
-# SOURCES += \
-#        VertexEditorWindow.cpp \
-#    Main.cpp \
-#    VertexEditorImage.cpp \
-#    Utils.cpp
-
-# HEADERS += \
-#        VertexEditorWindow.h \
-#    VertexEditorImage.h \
-#    Utils.h
 
 DISTFILES += \
     Test.png

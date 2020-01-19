@@ -9,18 +9,15 @@ Aerodlyn::VertexEditorTable::VertexEditorTable (QWidget *parent) : QTableWidget 
 
     setAlternatingRowColors (true);
     setHorizontalHeaderLabels (headerList);
-
-    horizontalHeader ()->setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
-    horizontalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
 }
 
 Aerodlyn::VertexEditorTable::~VertexEditorTable () {}
 
 /* Public Methods */
-void Aerodlyn::VertexEditorTable::setAssociatedPointList (QVector <float> *pointList)
+void Aerodlyn::VertexEditorTable::setRegion (std::optional <std::reference_wrapper <QPolygonF>> region)
 {
     this->clearContents ();
-    this->pointList = pointList;
+    this->region = region;
 
     update (true);
 }
@@ -33,11 +30,11 @@ void Aerodlyn::VertexEditorTable::setAssociatedPointList (QVector <float> *point
  */
 void Aerodlyn::VertexEditorTable::update (const bool refresh)
 {
-    if (!pointList)
+    if (!region.has_value ())
         return;
 
     int index = refresh ? 0 : rowCount ();
-    setRowCount (pointList->size () / 2);
+    setRowCount (region->get ().length ());
 
     for (; index < rowCount (); index++)
         update (index);
@@ -50,11 +47,13 @@ void Aerodlyn::VertexEditorTable::update (const bool refresh)
  */
 void Aerodlyn::VertexEditorTable::update (const int row)
 {
-    if (!pointList)
+    if (!region.has_value ())
         return;
 
-    setCellWidget (row, 0, new QLabel (QString::number (static_cast <double> (this->pointList->at (row * 2)))));
-    setCellWidget (row, 1, new QLabel (QString::number (static_cast <double> (this->pointList->at ((row * 2) + 1)))));
+    const QPointF point = region->get ().at (row);
+
+    setCellWidget (row, 0, new QLabel (QString::number (point.x ())));
+    setCellWidget (row, 1, new QLabel (QString::number (point.y ())));
 }
 
 /* Overridden Protected Methods */
@@ -63,5 +62,5 @@ void Aerodlyn::VertexEditorTable::resizeEvent (QResizeEvent *event)
     int columnWidth = static_cast <int> (event->size ().width () * 0.5f);
 
     setColumnWidth (0, columnWidth);
-    setColumnWidth (1, columnWidth + 5);
+    setColumnWidth (1, columnWidth);
 }

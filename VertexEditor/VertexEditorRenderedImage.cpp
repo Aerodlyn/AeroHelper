@@ -4,8 +4,8 @@
  * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the
  *  application as well as the background that gets rendered behind that image.
  *
- * @author  Patrick Jahnig (psj516)
- * @version 2018.08.03
+ * @author  Patrick Jahnig (Aerodlyn)
+ * @version 2020.01.18
  */
 
 /* Constructors/Deconstructors */
@@ -19,7 +19,7 @@
  *                                  location to render points by relative to that center (as some
  *                                  coordinates may be negative)
  */
-Aerodlyn::VertexEditorRenderedImage::VertexEditorRenderedImage (int &selectedPointIndex, QPoint &center)
+Aerodlyn::VertexEditorRenderedImage::VertexEditorRenderedImage (const int &selectedPointIndex, QPointF &center)
     : QLabel (nullptr), selectedPointIndex (selectedPointIndex), center (center)
 {
     setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -76,7 +76,7 @@ void Aerodlyn::VertexEditorRenderedImage::resizeToFit (const QSize &size)
         setFixedSize (iWidth > sWidth ? iWidth : sWidth, iHeight > sHeight ? iHeight : sHeight);
     }
 
-    center = QPoint (width () / 2, height () / 2);
+    center = QPointF (width () / 2, height () / 2);
 }
 
 /**
@@ -84,7 +84,8 @@ void Aerodlyn::VertexEditorRenderedImage::resizeToFit (const QSize &size)
  *
  * @param pointList - The pointer to the selected list of points, can be null
  */
-void Aerodlyn::VertexEditorRenderedImage::setPointList (QVector <float> *pointList) { this->pointList = pointList; }
+void Aerodlyn::VertexEditorRenderedImage::setRegion (std::optional <std::reference_wrapper <QPolygonF>> region)
+    { this->region = region; }
 
 /* Overridden Protected Methods */
 /**
@@ -100,32 +101,28 @@ void Aerodlyn::VertexEditorRenderedImage::paintEvent (QPaintEvent *event)
     painter.drawRect (0, 0, width () - 1, height () - 1);
     painter.drawImage ((width () - image.width ()) / 2, (height () - image.height ()) / 2, image);
 
-    if (!pointList)
+    if (!region.has_value ())
         return;
 
-    int size = pointList->size ();
+    int size = region->get ().size ();
 
     painter.setPen (QColor ("#FFFFFF"));
-    if (size >= 6)
-        painter.drawLine (static_cast <int> (pointList->at (0) + center.x ()), static_cast <int> (pointList->at (1) + center.y ()),
-                          static_cast <int> (pointList->at (size - 2) + center.x ()), static_cast <int> (pointList->at (size - 1) + center.y ()));
+    if (size >= 2)
+        painter.drawLine (region->get ().at (0) + center, region->get ().at (size - 1) + center);
 
-    for (int i = 0; i < size; i += 2)
+    for (int i = 0; i < size; i++)
     {
-        const float x = pointList->at (i) + center.x (),
-                    y = pointList->at (i + 1) + center.y ();
+        const QPointF point = region->get ().at (i) + center;
 
-        if (size >= 4 && i < size - 2)
-            painter.drawLine (static_cast <int> (x), static_cast <int> (y),
-                              static_cast <int> (pointList->at (i + 2) + center.x ()), static_cast <int> (pointList->at (i + 3) + center.y ()));
+        if (size >= 2 && i < size - 1)
+            painter.drawLine (point, region->get ().at (i + 1) + center);
 
-        if (selectedPointIndex * 2 == i)
+        if (selectedPointIndex == i)
             painter.setBrush (QBrush ("#000000"));
 
         else
             painter.setBrush (QBrush ("#FFFFFF"));
 
-        painter.drawEllipse (static_cast <int> (x - POINT_RADIUS / 2.0f), static_cast <int> (y - POINT_RADIUS / 2.0f),
-                             static_cast <int> (POINT_RADIUS), static_cast <int> (POINT_RADIUS));
+        painter.drawEllipse (point, POINT_RADIUS, POINT_RADIUS);
     }
 }

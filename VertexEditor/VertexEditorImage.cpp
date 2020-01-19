@@ -5,7 +5,7 @@
  *  related to a drawn image.
  *
  * @author  Patrick Jahnig (psj516)
- * @version 2018.08.03
+ * @version 2020.01.18
  */
 
 /* Constructors/Deconstructors */
@@ -38,20 +38,22 @@ Aerodlyn::VertexEditorImage::~VertexEditorImage () {}
  *
  * @return True if the image was loaded and set, false otherwise
  */
-bool Aerodlyn::VertexEditorImage::setImageFile (const QString &filepath) { return image->load (filepath); }
+bool Aerodlyn::VertexEditorImage::setImageFile (const QString &filepath)
+    { return image->load (filepath); }
 
 /**
- * Sets the point list to use for input handling and rendering.
+ * Sets the region to use for input handling and rendering.
  *
- * @param pointList - The pointer to the selected list of points, can be null
+ * @param region - The {@link QPolygonF} region of points
  */
-void Aerodlyn::VertexEditorImage::setPointList (QVector <float> *pointList)
+void Aerodlyn::VertexEditorImage::setRegion (std::optional <std::reference_wrapper <QPolygonF>> region)
 {
-    this->pointList = pointList;
-    image->setPointList (this->pointList);
+    this->region = region;
+    image->setRegion (this->region);
 }
 
-void Aerodlyn::VertexEditorImage::update () { image->update (); }
+void Aerodlyn::VertexEditorImage::update ()
+    { image->update (); }
 
 /**
  * Returns the mouse position associated with the given {@link QMouseEvent} adjusted for the location
@@ -59,14 +61,14 @@ void Aerodlyn::VertexEditorImage::update () { image->update (); }
  *
  * @param event - The QMouseEvent to get the mouse coordinates from
  *
- * @return The adjusted mouse position as a {@link QPoint} object
+ * @return The adjusted mouse position as a {@link QPointF} object
  */
-const QPoint Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEvent * const event)
+const QPointF Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEvent * const event) const
 {
-    const int evtX = (event->x () + horizontalScrollBar()->value ()) - center.x (),
-              evtY = (event->y () + verticalScrollBar ()->value ()) - center.y ();
+    const double evtX = (event->x () + horizontalScrollBar()->value ()) - center.x ();
+    const double evtY = (event->y () + verticalScrollBar ()->value ()) - center.y ();
 
-    return QPoint (evtX, evtY);
+    return QPointF (evtX, evtY);
 }
 
 /* Overridden Protected Methods */
@@ -75,18 +77,18 @@ const QPoint Aerodlyn::VertexEditorImage::adjustedMousePosition (const QMouseEve
  */
 void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
 {
-    if (!pointList)
+    if (!region.has_value ())
         return;
 
-    const QPoint adjPos = adjustedMousePosition (event);
+    const QPointF adjPos = adjustedMousePosition (event);
     if (!leftButtonHeld)
     {
         selectedPointIndex = -1;
-        for (int i = 0; i < pointList->size () && selectedPointIndex == -1; i += 2)
+        for (int i = 0; i < region->get ().size () && selectedPointIndex == -1; i++)
         {
-            const float x = pointList->at (i), y = pointList->at (i + 1);
-            if (Utils::isInCircle (adjPos.x (), adjPos.y (), x, y, POINT_RADIUS))
-                selectedPointIndex = i / 2;
+            const QPointF point = region->get ().at (i);
+            if (Utils::isInCircle (adjPos.x (), adjPos.y (), point.x (), point.y (), POINT_RADIUS))
+                selectedPointIndex = i;
         }
     }
 
@@ -107,11 +109,10 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
  */
 void Aerodlyn::VertexEditorImage::mousePressEvent (QMouseEvent *event)
 {
-    const QPoint adjPos = adjustedMousePosition (event);
+    const QPointF adjPos = adjustedMousePosition (event);
     leftButtonHeld = true;
 
     if (selectedPointIndex == -1)
-        // TODO: Look into handling floating points
         emit mouseClicked (adjPos.x (), adjPos.y ());
 
     image->update ();
@@ -129,4 +130,5 @@ void Aerodlyn::VertexEditorImage::mouseReleaseEvent (QMouseEvent *event)
 /**
  * See: https://doc.qt.io/qt-5/qwidget.html#resizeEvent
  */
-void Aerodlyn::VertexEditorImage::resizeEvent (QResizeEvent *event) { image->resizeToFit (event->size ()); }
+void Aerodlyn::VertexEditorImage::resizeEvent (QResizeEvent * const event)
+    { image->resizeToFit (event->size ()); }

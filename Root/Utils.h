@@ -11,7 +11,7 @@
 class Utils
 {
     public: // Methods
-        static bool isInCircle (const float x, const float y, const float cx, const float cy, const float cr);
+        static bool isInCircle (const double x, const double y, const double cx, const double cy, const double cr);
 
         static QString getTitle ();
         static QString getVersion ();

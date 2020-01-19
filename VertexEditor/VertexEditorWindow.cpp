@@ -8,7 +8,7 @@
  *  requires an array of points to create polygonal shapes.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2019.09.12
+ * @version 2020.01.18
  */
 
 /* Constructors/Deconstructors */
@@ -44,6 +44,7 @@ Aerodlyn::VertexEditorWindow::VertexEditorWindow (QWidget *parent) : QMainWindow
 
     deleteDataSet = new QPushButton ("Delete Selected Data Set");
     dataSetVBox->addWidget (deleteDataSet);
+    connect (deleteDataSet, &QPushButton::released, this, &VertexEditorWindow::handleDeleteDataSet);
 
     deleteAllDataSets = new QPushButton ("Delete All Data Sets");
     dataSetVBox->addWidget (deleteAllDataSets);
@@ -118,14 +119,11 @@ Aerodlyn::VertexEditorWindow::~VertexEditorWindow () {}
  * @param x The x coordinate
  * @param y The y coordinate
  */
-void Aerodlyn::VertexEditorWindow::addPointToSelectedDataSet (const float x, const float y)
+void Aerodlyn::VertexEditorWindow::addPointToSelectedDataSet (const double x, const double y)
 {
-    if (dataSetListWidget->selectedItems ().size () > 0)
+    if (currentRegion.has_value ())
     {
-        currentDataSetPoints->append (x);
-        currentDataSetPoints->append (y);
-
-        // *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+        currentRegion->get () << QPointF (x, y);
         vertexTable->update ();
     }
 }
@@ -137,6 +135,7 @@ void Aerodlyn::VertexEditorWindow::addPointToSelectedDataSet (const float x, con
  */
 void Aerodlyn::VertexEditorWindow::handleAddDataSet ()
 {
+    // TODO: Adjust to use regex
     bool confirmed;
     QStringList names = QInputDialog::getText (this, DATA_SET_INPUT_DIALOG_HEADER, DATA_SET_INPUT_DIALOG_DESC,
         QLineEdit::Normal, "", &confirmed)
@@ -146,24 +145,18 @@ void Aerodlyn::VertexEditorWindow::handleAddDataSet ()
 
     if (confirmed)
     {
-        for (QString s : names)
+        for (QString name : names)
         {
-            if (!dataSetList.contains (s))
-            {
-                dataSetList.append (s);
-                std::sort (dataSetList.begin (), dataSetList.end ());
+            const int index = dataSets.add (name);
 
-                int index = dataSetList.indexOf (s);
-
-                dataSetListWidget->insertItem (index, s);
-                dataSets.insert (index, QVector <float> ());
-            }
+            if (index >= 0)
+                dataSetListWidget->insertItem (index, name);
 
             else
             {
                 // Prompt user if they would like to rename one of the conflicting data sets
                 QString errorText = QString ("A data set with the name '%1' already exists."
-                    "\nYou can either clear that data set, or delete it and add it again.").arg (s);
+                    "\nYou can either clear that data set, or delete it and add it again.").arg (name);
                 QMessageBox::critical (this, "Error", errorText);
             }
         }
@@ -175,10 +168,9 @@ void Aerodlyn::VertexEditorWindow::handleAddDataSet ()
  */
 void Aerodlyn::VertexEditorWindow::handleClearDataSet ()
 {
-    if (selectedDataSetIndex != -1)
+    if (currentRegion.has_value ())
     {
-        currentDataSetPoints->clear ();
-        // *(dataSets.data () + selectedDataSetIndex) = currentDataSetPoints;
+        currentRegion->get ().clear ();
 
         vertexImage->update ();
         vertexTable->update ();
@@ -190,12 +182,11 @@ void Aerodlyn::VertexEditorWindow::handleClearDataSet ()
  */
 void Aerodlyn::VertexEditorWindow::handleClearAllDataSets ()
 {
-    for (int i = 0; i < dataSets.size (); i++)
-        (dataSets.data () + i)->clear ();
-
-    if (selectedDataSetIndex != -1)
+    for (int i = 0; i < dataSetListWidget->count (); i++)
     {
-        currentDataSetPoints->clear ();
+        const auto item = dataSets.get (dataSetListWidget->item (i)->text ());
+        if (item.has_value ())
+            item->get ().clear ();
 
         vertexImage->update ();
         vertexTable->update ();
@@ -211,11 +202,30 @@ void Aerodlyn::VertexEditorWindow::handleClearAllDataSets ()
 void Aerodlyn::VertexEditorWindow::handleDataSelection (int currentRow)
 {
     selectedDataSetIndex = currentRow;
-    currentDataSetPoints = dataSets.data () + currentRow;
+    currentRegion = dataSets.get (dataSetListWidget->item (selectedDataSetIndex)->text ());
 
-    vertexTable->setAssociatedPointList (currentDataSetPoints);
-    vertexImage->setPointList (currentDataSetPoints);
+    vertexTable->setRegion (currentRegion);
+    vertexImage->setRegion (currentRegion);
     vertexImage->update ();
+}
+
+/**
+ * Handles deleting the currently selected data set. Does nothing if no data set is
+ *  selected.
+ */
+void Aerodlyn::VertexEditorWindow::handleDeleteDataSet ()
+{
+    if (currentRegion.has_value ())
+    {
+        const QListWidgetItem *item = dataSetListWidget->takeItem (selectedDataSetIndex);
+
+        dataSets.remove (item->text ());
+
+        delete item;
+        currentRegion = std::nullopt; // TODO: Set to another existing region if there is one
+
+        vertexTable->setRegion (currentRegion);
+    }
 }
 
 /**
@@ -241,11 +251,15 @@ void Aerodlyn::VertexEditorWindow::handleHoveredPoint (int index)
  * @param y     - The y coordinate of the mouse click
  * @param index - The index of the point being hovered over
  */
-void Aerodlyn::VertexEditorWindow::handleMouseMoved (const float x, const float y, const int index)
+void Aerodlyn::VertexEditorWindow::handleMouseMoved (const double x, const double y, const int index)
 {
-    int adjIndex = index * 2;
-    currentDataSetPoints->data () [adjIndex] = x;
-    currentDataSetPoints->data () [adjIndex + 1] = y;
+    if (!currentRegion.has_value ())
+        return;
+
+    QPointF &point = currentRegion->get () [index];
+
+    point.setX (x);
+    point.setY (y);
 
     vertexTable->update (index);
 }
@@ -270,7 +284,8 @@ void Aerodlyn::VertexEditorWindow::handleOpenImage ()
  * Handles gracefully exiting the program. If the user has unsaved data, a prompt will
  *  inform the user of that and ask if they want to save the data before exiting.
  */
-void Aerodlyn::VertexEditorWindow::handleQuit () { exit (0); }
+void Aerodlyn::VertexEditorWindow::handleQuit ()
+    { exit (0); }
 
 /**
  * Handles saving the current data sets to file, whose filetype is of the users choosing (possibly
@@ -278,6 +293,6 @@ void Aerodlyn::VertexEditorWindow::handleQuit () { exit (0); }
  */
 void Aerodlyn::VertexEditorWindow::handleSaveDataSets ()
 {
-    if (dataSetList.length () > 0)
-        QString filename = QFileDialog::getSaveFileName (this, "Save Data Sets", lastOpenedDirPath);
+    /* if (dataSetList.length () > 0)
+        QString filename = QFileDialog::getSaveFileName (this, "Save Data Sets", lastOpenedDirPath); */
 }

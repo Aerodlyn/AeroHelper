@@ -1,10 +1,15 @@
 #ifndef VERTEX_EDITOR_RENDERED_IMAGE_H
 #define VERTEX_EDITOR_RENDERED_IMAGE_H
 
+#include <functional>
+#include <optional>
+
 #include <QImage>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPolygonF>
+#include <QPointF>
 #include <QResizeEvent>
 #include <QVector>
 
@@ -14,8 +19,8 @@ namespace Aerodlyn
      * A subcomponent of {@link VertexEditorImage}, represents the image file that gets rendered to the
      *  application as well as the background that gets rendered behind that image.
      *
-     * @author  Patrick Jahnig (psj516)
-     * @version 2018.08.03
+     * @author  Patrick Jahnig (Aerodlyn)
+     * @version 2020.01.18
      */
     class VertexEditorRenderedImage : public QLabel
     {
@@ -30,7 +35,7 @@ namespace Aerodlyn
              *                                  location to render points by relative to that center (as some
              *                                  coordinates may be negative)
              */
-            VertexEditorRenderedImage (int &selectedPointIndex, QPoint &center);
+            VertexEditorRenderedImage (const int &selectedPointIndex, QPointF &center);
 
             /**
              * Destroys this {@link VertexEditorRenderedImage} instance.
@@ -58,11 +63,11 @@ namespace Aerodlyn
             void resizeToFit (const QSize &size);
 
             /**
-             * Sets the point list to use for input handling and rendering.
+             * Sets the region to use for input handling and rendering.
              *
-             * @param pointList - The pointer to the selected list of points, can be null
+             * @param region - The {@link QPolygonF} region of points
              */
-            void setPointList (QVector <float> *pointList);
+            void setRegion (std::optional <std::reference_wrapper <QPolygonF>> region);
 
         protected: // Methods
             /**
@@ -71,15 +76,18 @@ namespace Aerodlyn
             void paintEvent (QPaintEvent *event) override final;
 
         private: // Variables
-            int                             &selectedPointIndex;
+            const int                                          &selectedPointIndex;
 
-            const float                     POINT_RADIUS            = 5.0f;
+            const double                                       POINT_RADIUS         = 5.0;
 
-            QImage                          image;
-            QPoint                          &center;
-            QVector <float>                 *pointList              = nullptr;
+            const QColor                                       BACKGROUND_COLOR     = QColor ("#FF00FF");
 
-            const QColor                    BACKGROUND_COLOR        = QColor ("#FF19B9");
+            QImage                                             image;
+
+            QPointF                                            &center;
+
+
+            std::optional <std::reference_wrapper <QPolygonF>> region;
     };
 }
 

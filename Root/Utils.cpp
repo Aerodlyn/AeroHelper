@@ -1,15 +1,15 @@
 #include "Utils.h"
 
 /* Public Methods */
-bool Utils::isInCircle (const float x, const float y, const float cx, const float cy, const float cr)
+bool Utils::isInCircle (const double x, const double y, const double cx, const double cy, const double cr)
 {
-    float dx = abs (x - cx), dy = abs (y - cy);
+    const double dx = abs (x - cx), dy = abs (y - cy);
 
     if (dx > cr || dy > cr)
         return false;
 
     else
-        return (dx + dy <= cr) || pow (static_cast <double> (dx), 2) + pow (static_cast <double> (dy), 2) <= pow (static_cast <double> (cr), 2);
+        return (dx + dy <= cr) || pow (dx, 2) + pow (dy, 2) <= pow (cr, 2);
 }
 
 QString Utils::getTitle () { return QString ("AeroHelper | Ver: ").append (getVersion ()); }

@@ -1,8 +1,13 @@
 #ifndef VERTEX_EDITOR_TABLE_H
 #define VERTEX_EDITOR_TABLE_H
 
+#include <functional>
+#include <optional>
+
 #include <QHeaderView>
 #include <QLabel>
+#include <QPointF>
+#include <QPolygonF>
 #include <QResizeEvent>
 #include <QString>
 #include <QStringList>
@@ -25,7 +30,7 @@ namespace Aerodlyn
             ~VertexEditorTable () override;
 
         public: // Methods
-            void setAssociatedPointList (QVector <float> *pointList = nullptr);
+            void setRegion (std::optional <std::reference_wrapper <QPolygonF>> region = std::nullopt);
 
             /**
              * Updates the table, either by updating the last row (i.e. a new data point as been
@@ -46,9 +51,10 @@ namespace Aerodlyn
             void resizeEvent (QResizeEvent *event) override final;
 
         private: // Variables
-            const QString   DATA_COLUMN_01_HEADER   = "X",
-                            DATA_COLUMN_02_HEADER   = "Y";
-            QVector <float> *pointList              = nullptr;
+            std::optional <std::reference_wrapper <QPolygonF>> region                = std::nullopt;
+
+            const QString                                      DATA_COLUMN_01_HEADER = "X";
+            const QString                                      DATA_COLUMN_02_HEADER = "Y";
     };
 }
 

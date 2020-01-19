@@ -87,7 +87,7 @@ void Aerodlyn::VertexEditorImage::mouseMoveEvent (QMouseEvent *event)
         for (int i = 0; i < region->get ().size () && selectedPointIndex == -1; i++)
         {
             const QPointF point = region->get ().at (i);
-            if (Utils::isInCircle (adjPos.x (), adjPos.y (), point.x (), point.y (), POINT_RADIUS))
+            if (Utils::isInCircle (adjPos, point, POINT_RADIUS))
                 selectedPointIndex = i;
         }
     }

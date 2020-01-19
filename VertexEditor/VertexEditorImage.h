@@ -1,12 +1,16 @@
 #ifndef VERTEXEDITORIMAGE_H
 #define VERTEXEDITORIMAGE_H
 
+#include <functional>
+#include <optional>
+
 #include <QCursor>
 #include <QImage>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPoint>
+#include <QPointF>
+#include <QPolygonF>
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -23,8 +27,8 @@ namespace Aerodlyn
      *  of an image as well as the vertex points of a selected data set (given from the owner of this
      *  specific VertexEditorImage instance).
      *
-     * @author  Patrick Jahnig (psj516)
-     * @version 2018.08.03
+     * @author  Patrick Jahnig (Aerodlyn)
+     * @version 2020.01.18
      */
     class VertexEditorImage : public QScrollArea
     {
@@ -56,11 +60,11 @@ namespace Aerodlyn
             bool setImageFile (const QString &filepath);
 
             /**
-             * Sets the point list to use for input handling and rendering.
+             * Sets the region to use for input handling and rendering.
              *
-             * @param pointList - The pointer to the selected list of points, can be null
+             * @param region - The {@link QPolygonF} region of points
              */
-            void setPointList (QVector <float> *pointList);
+            void setRegion (std::optional <std::reference_wrapper <QPolygonF>> region);
 
             void update ();
 
@@ -70,9 +74,9 @@ namespace Aerodlyn
              *
              * @param event - The QMouseEvent to get the mouse coordinates from
              *
-             * @return The adjusted mouse position as a {@link QPoint} object
+             * @return The adjusted mouse position as a {@link QPointF} object
              */
-            const QPoint adjustedMousePosition (const QMouseEvent * const event);
+            const QPointF adjustedMousePosition (const QMouseEvent * const event) const;
 
         protected: // Methods
             /**
@@ -93,19 +97,22 @@ namespace Aerodlyn
             /**
              * See: https://doc.qt.io/qt-5/qwidget.html#resizeEvent
              */
-            void resizeEvent (QResizeEvent *event) override final;
+            void resizeEvent (QResizeEvent * event) override final;
 
         private: // Variables
-            bool                        leftButtonHeld;
-            int                         selectedPointIndex  = -1;
+            bool                                               leftButtonHeld;
 
-            const float                 POINT_RADIUS        = 5.0f;
+            int                                                selectedPointIndex = -1;
 
-            QPoint                      center;
-            QVector <float>             *pointList          = nullptr;
-            VertexEditorRenderedImage   *image;
+            const double                                       POINT_RADIUS       = 5.0;
 
-            const QWidget               PARENT;
+            QPointF                                            center;
+
+            const QWidget                                      PARENT;
+
+            std::optional <std::reference_wrapper <QPolygonF>> region;
+
+            VertexEditorRenderedImage                          *image;
 
         signals:
             /**
@@ -115,7 +122,7 @@ namespace Aerodlyn
              * @param x - The x coordinate of the mouse click
              * @param y - The y coordinate of the mouse click
              */
-            void mouseClicked (float x, float y);
+            void mouseClicked (const double x, const double y);
 
             /**
              * Signals that the mouse has been moved within this VertexEditorImage instance, and
@@ -125,7 +132,7 @@ namespace Aerodlyn
              * @param index - The index of the point being hovered over, else if no such point exists,
              *                  -1.
              */
-            void mouseHovered (int index);
+            void mouseHovered (const int index);
 
             /**
              * Signals that the mouse is hovering a point and clicks, and drags.
@@ -134,7 +141,7 @@ namespace Aerodlyn
              * @param y     - The y coordinate of the mouse click
              * @param index - The index of the point being hovered over
              */
-            void mouseMoved (const float x, const float y, const int index);
+            void mouseMoved (const double x, const double y, const int index);
     };
 }
 

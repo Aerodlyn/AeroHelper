@@ -2,6 +2,9 @@
 #define VERTEXEDITORWINDOW_H
 
 #include <algorithm>
+#include <functional>
+#include <optional>
+#include <utility>
 
 #include <QDir>
 #include <QFileDialog>
@@ -15,12 +18,16 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPointF>
+#include <QPolygonF>
 #include <QPushButton>
 #include <QString>
 #include <QVBoxLayout>
 #include <QVector>
 
 #include "Root/Utils.h"
+#include "Utilities/VertexDataSetCollection.h"
+
 #include "VertexEditorImage.h"
 #include "VertexEditorTable.h"
 
@@ -34,7 +41,7 @@ namespace Aerodlyn
      *  requires an array of points to create polygonal shapes.
      *
      * @author  Patrick Jahnig (Aerodlyn)
-     * @version 2018.05.31
+     * @version 2020.01.18
      */
     class VertexEditorWindow : public QMainWindow
     {
@@ -56,27 +63,47 @@ namespace Aerodlyn
             ~VertexEditorWindow ();
 
         private: // Variables
-            int                         selectedDataSetIndex;
+            int                                                selectedDataSetIndex;
 
-            const unsigned int          MARGIN = 5, SPACING = 5;
+            const unsigned int                                 MARGIN                   = 5;
+            const unsigned int                                 SPACING                  = 5;
 
-            QAction                     *loadImageAction, *quitAction, *saveDataAction;
-            QGridLayout                 *gridLayout;
-            QList <QString>             dataSetList;
-            QListWidget                 *dataSetListWidget;
-            QMenu                       *fileMenu;
-            QPushButton                 *addDataSetButton, *clearDataSetButton, *clearAllDataSetsButton,
-                                            *deleteDataSet, *deleteAllDataSets;
-            QString                     lastOpenedDirPath = QDir::homePath ();
-            QVBoxLayout                 *dataSetVBox;
-            QVector <float>             *currentDataSetPoints = nullptr;
-            QVector <QVector <float>>   dataSets;
-            QWidget                     *centralWidget;
+            std::optional <std::reference_wrapper <QPolygonF>> currentRegion            = std::nullopt;
 
-            VertexEditorImage           *vertexImage = nullptr;
-            VertexEditorTable           *vertexTable = nullptr;
+            QAction                                            *loadImageAction;
+            QAction                                            *quitAction;
+            QAction                                            *saveDataAction;
 
-            const QString DATA_COLUMN_01_HEADER         = "X", DATA_COLUMN_02_HEADER = "Y";
+            QGridLayout                                        *gridLayout;
+
+            QListWidget                                        *dataSetListWidget;
+
+            QMenu                                              *fileMenu;
+
+            QPushButton                                        *addDataSetButton;
+            QPushButton                                        *clearDataSetButton;
+            QPushButton                                        *clearAllDataSetsButton;
+            QPushButton                                        *deleteDataSet;
+            QPushButton                                        *deleteAllDataSets;
+
+            QString                                            lastOpenedDirPath        = QDir::homePath ();
+
+            const QString                                      DATA_COLUMN_01_HEADER    = "X";
+            const QString                                      DATA_COLUMN_02_HEADER    = "Y";
+
+            QVBoxLayout                                        *dataSetVBox;
+
+//            QVector <float>                                *currentDataSetPoints = nullptr;
+//            QVector <std::pair <QString, QVector <float>>> dataSets;
+
+            QWidget                                            *centralWidget;
+
+            VertexDataSetCollection                            dataSets;
+
+            VertexEditorImage                                  *vertexImage = nullptr;
+            VertexEditorTable                                  *vertexTable = nullptr;
+
+            // TODO: Move to separate file
             const QString DATA_SET_INPUT_DIALOG_HEADER  = "Enter name of data set",
                             DATA_SET_INPUT_DIALOG_DESC  = "A data set name can contain any character except for spaces"
                                                             "\nas any will be removed upon creation. Multiple data sets"
@@ -106,7 +133,7 @@ namespace Aerodlyn
              * @param x The x coordinate
              * @param y The y coordinate
              */
-            void addPointToSelectedDataSet (const float x, const float y);
+            void addPointToSelectedDataSet (const double x, const double y);
 
             /**
              * Handles attempting to add a new data set. Prompts the user to enter the name of the new set,
@@ -134,6 +161,12 @@ namespace Aerodlyn
             void handleDataSelection (int currentRow);
 
             /**
+             * Handles deleting the currently selected data set. Does nothing if no data set is
+             *  selected.
+             */
+            void handleDeleteDataSet ();
+
+            /**
              * Handles selecting the row of the table view that represents the point that the user is currently
              *  hovering their mouse over. If the user is not hovering over a point, then the last added point is
              *  highlighted in the table view.
@@ -149,7 +182,7 @@ namespace Aerodlyn
              * @param y     - The y coordinate of the mouse click
              * @param index - The index of the point being hovered over
              */
-            void handleMouseMoved (const float x, const float y, const int index);
+            void handleMouseMoved (const double x, const double y, const int index);
 
             /**
              * Handles opening a new image that the user can base their clicks upon. Replaces the previously

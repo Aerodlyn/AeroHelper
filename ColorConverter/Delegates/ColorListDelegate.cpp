@@ -40,8 +40,14 @@ bool Aerodlyn::ColorListDelegate::editorEvent (
 
 void Aerodlyn::ColorListDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    // Text color
+    painter->setPen (Qt::black);
+
     if (option.state & QStyle::State_Selected)
+    {
         painter->fillRect (option.rect, option.palette.highlight ());
+        painter->setPen (Qt::white);
+    }
 
     const QColor color = index.data (Qt::DecorationRole).value <QColor> ();
     const QString text = index.data ().toString ();

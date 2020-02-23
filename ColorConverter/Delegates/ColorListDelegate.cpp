@@ -6,7 +6,7 @@
  *   palette.
  *
  * @author  Patrick Jahnig (Aerodlyn)
- * @version 2020.02.19
+ * @version 2020.02.23
  */
 
 /* Public overridden methods */
@@ -17,7 +17,7 @@ bool Aerodlyn::ColorListDelegate::editorEvent (
     const QModelIndex &index
 )
 {
-    Q_UNUSED (option);
+    Q_UNUSED (option)
 
     if (event->type () == QEvent::MouseButtonDblClick)
     {
@@ -40,7 +40,15 @@ bool Aerodlyn::ColorListDelegate::editorEvent (
 
 void Aerodlyn::ColorListDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QStyledItemDelegate::paint (painter, option, index);
+    if (option.state & QStyle::State_Selected)
+        painter->fillRect (option.rect, option.palette.highlight ());
 
-    painter->drawRect (option.rect.x () + 5, option.rect.y () + 2, 15, 15);
+    const QColor color = index.data (Qt::DecorationRole).value <QColor> ();
+    const QString text = index.data ().toString ();
+
+    const QRect colorRect = QRect (option.rect.x () + 1, option.rect.y () + 1, option.rect.height () - 2, option.rect.height () - 2);
+    painter->fillRect (colorRect, Qt::black);
+    painter->fillRect (colorRect.adjusted (1, 1, -1, -1), color);
+
+    painter->drawText (colorRect.x () + colorRect.width () + 5, option.rect.y (), option.rect.width (), option.rect.height (), Qt::AlignVCenter, text);
 }
